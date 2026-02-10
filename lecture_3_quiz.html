@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2007 – Lecture 3 MCQ Quiz: Jetpack Compose</title>
+  <style>
+    :root { --maxw: 980px; --accent: #0f766e; --muted:#6b7280; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", sans-serif; line-height: 1.45; margin: 0; background: #f7f7f8;
+    color:#111827; }
+    header { background: white; border-bottom: 1px solid #e5e7eb; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 18px 16px; }
+    h1 { font-size: clamp(20px, 2.6vw, 28px); margin: 0 0 6px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
+    button { cursor:pointer; border:1px solid #e5e7eb; background:white;
+    padding:8px 12px; border-radius:10px; font-weight:600; }
+    button.primary { background: var(--accent); color: white; border-color:
+    var(--accent); }
+    button:disabled { opacity:.6; cursor:not-allowed }
+    .stats { display:flex; gap:18px; align-items:center; margin-top:10px; }
+    .pill { background:#eef2ff; color:#3730a3; font-weight:700; padding:6px
+    10px; border-radius:999px; }
+    main { max-width: var(--maxw); margin: 12px auto 60px; padding: 0 16px; }
+    .qcard { background:white; border:1px solid #e5e7eb; border-radius:14px;
+    padding:14px; margin:14px 0; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+    .qhead { display:flex; justify-content:space-between; align-items:baseline;
+    gap:6px }
+    .qtitle { font-weight:700; margin:0 0 8px }
+    .badge { font-size:12px; color:#374151; background:#f3f4f6; border:1px
+    solid #e5e7eb; padding:2px 8px; border-radius:999px }
+    .opts { display:grid; gap:8px; margin-top:8px }
+    .opt { display:flex; gap:10px; align-items:flex-start; padding:10px;
+    border:1px solid #e5e7eb; border-radius:12px; background:white; cursor:pointer; }
+    .opt:hover { border-color:#c7d2fe; }
+    .opt.correct { border-color:#16a34a; background:#f0fdf4; }
+    .opt.wrong { border-color:#dc2626; background:#fef2f2; }
+    .opt.disabled { pointer-events:none; opacity:.8 }
+    .letter { width:28px; height:28px; border-radius:999px; border:1px
+    solid #e5e7eb; display:grid; place-items:center; font-weight:700; }
+    .exp { margin-top:10px; border-top:1px dashed #e5e7eb; padding-top:10px;
+    color:#111827; }
+    .exp strong { color:#065f46 }
+    footer { text-align:center; color:#6b7280; padding:30px 12px; }
+    details > summary { cursor:pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2007 – Lecture 3 MCQ Quiz: Jetpack Compose</h1>
+      <div class="sub">INF2007 – Mobile Application Development • Lecture 3</div>
+      <div class="stats" id="stats">
+        <span class="pill" id="score">Score: 0</span>
+        <span class="pill" id="progress">Answered: 0 / 0</span>
+        <span class="pill" id="percent">0%</span>
+      </div>
+      <div class="controls">
+        <button class="primary" id="resetBtn" title="Reset the quiz to try again">Reset quiz</button>
+        <button id="revealBtn" title="Reveal correct answers for all questions">Reveal all answers</button>
+        <button id="shuffleBtn" title="Shuffle questions and answer options">Shuffle</button>
+      </div>
+    </div>
+  </header>
+  <main id="quiz"></main>
+  <footer>
+    Based on lecture material. This educational quiz is for practice.
+  </footer>
+  <script>
+    const QUESTIONS = [
+  {
+    "q": "Why was Jetpack Compose introduced as an alternative to the traditional Android View system?",
+    "options": [
+      "To address limitations of the imperative XML‑based UI system and provide a declarative approach",
+      "Because XML layouts are no longer supported in Android",
+      "To remove the need for Kotlin",
+      "To force developers to write UI in Java"
+    ],
+    "correct": 0,
+    "why": "Compose addresses limitations of the old XML view system by unifying UI and logic and using a declarative, state‑driven model【543652055253700†L33-L41】【543652055253700†L67-L72】."
+  },
+  {
+    "q": "In Jetpack Compose's declarative model, the UI is defined as a function of what?",
+    "options": [
+      "State",
+      "XML resources",
+      "Activity lifecycle methods",
+      "Layout files"
+    ],
+    "correct": 0,
+    "why": "The declarative UI model states that the UI is a function of state: UI = f(state)【543652055253700†L88-L100】."
+  },
+  {
+    "q": "Which annotation identifies a function as a composable in Jetpack Compose?",
+    "options": [
+      "@Composable",
+      "@AndroidEntryPoint",
+      "@Preview",
+      "@Layout"
+    ],
+    "correct": 0,
+    "why": "Composable functions are annotated with @Composable【543652055253700†L106-L111】."
+  },
+  {
+    "q": "What property should composable functions exhibit to encourage predictability?",
+    "options": [
+      "They should be pure functions with no side effects",
+      "They should mutate global state",
+      "They should perform network I/O",
+      "They should cache results across all calls"
+    ],
+    "correct": 0,
+    "why": "Composable functions are expected to be pure: the same input produces the same output and no side effects【543652055253700†L114-L117】."
+  },
+  {
+    "q": "How does Compose handle dynamic content within a composable?",
+    "options": [
+      "You can use conditional statements and loops because composables are written in Kotlin",
+      "You must predefine all UI in XML",
+      "Dynamic content is not supported",
+      "You need to write reflection code"
+    ],
+    "correct": 0,
+    "why": "Composable functions are written in Kotlin, allowing use of if statements, loops and helper functions for dynamic UI【543652055253700†L120-L131】."
+  },
+  {
+    "q": "What triggers a recomposition in Jetpack Compose?",
+    "options": [
+      "A change in state observed by a composable",
+      "Any change in a local variable unrelated to UI",
+      "Calling onResume() in the Activity",
+      "Opening and closing the app"
+    ],
+    "correct": 0,
+    "why": "Recomposition occurs when a composable's input state changes; Compose then redraws the affected UI elements【543652055253700†L142-L161】."
+  },
+  {
+    "q": "Which of the following statements about recomposition is true?",
+    "options": [
+      "Compose selectively recomposes only the UI elements whose inputs have changed",
+      "Recomposition restarts the activity",
+      "Recomposition completely reloads the app",
+      "Recomposition triggers a full device reboot"
+    ],
+    "correct": 0,
+    "why": "Compose performs intelligent recomposition, updating only the parts of the UI tree whose inputs changed【543652055253700†L142-L161】."
+  },
+  {
+    "q": "What is a slot‑based layout in Jetpack Compose?",
+    "options": [
+      "A layout like Scaffold that provides predefined areas (slots) for top app bar, bottom app bar, FAB, etc.",
+      "A layout that arranges items in a grid automatically",
+      "A container that only allows one child",
+      "A form of navigation controller"
+    ],
+    "correct": 0,
+    "why": "The slides describe slot‑based layouts such as Scaffold that provide slots for common top‑level Material components【543652055253700†L199-L210】."
+  },
+  {
+    "q": "Which list shows common top‑level components provided by Scaffold?",
+    "options": [
+      "TopAppBar, BottomAppBar, FloatingActionButton, Drawer",
+      "Activity, Service, BroadcastReceiver",
+      "RecyclerView, ViewModel, LiveData",
+      "AlertDialog, Snackbar, Tooltip"
+    ],
+    "correct": 0,
+    "why": "Scaffold offers slots for TopAppBar, BottomAppBar, FloatingActionButton, Drawer and other Material components【543652055253700†L199-L210】."
+  },
+  {
+    "q": "What is the purpose of modifiers in Jetpack Compose?",
+    "options": [
+      "They decorate or modify a composable's size, layout, appearance or interactions",
+      "They compile composables into machine code",
+      "They replace the need for state management",
+      "They provide navigation between screens"
+    ],
+    "correct": 0,
+    "why": "Modifiers change a composable's size, layout, appearance and can add interactions like click handling【543652055253700†L229-L236】."
+  },
+  {
+    "q": "In Compose, what does `remember` do?",
+    "options": [
+      "Stores a value in memory across recompositions",
+      "Deletes state on each recomposition",
+      "Forces the UI to recompose on every frame",
+      "Automatically persists state through configuration changes"
+    ],
+    "correct": 0,
+    "why": "The `remember` function stores a value in memory across recompositions【543652055253700†L279-L282】."
+  },
+  {
+    "q": "What type does `mutableStateOf()` return?",
+    "options": [
+      "A `MutableState` instance that triggers UI updates when its value changes",
+      "A regular Kotlin mutable list",
+      "A Boolean flag",
+      "An immutable value with no updates"
+    ],
+    "correct": 0,
+    "why": "`mutableStateOf` returns a MutableState instance; when the value changes, Compose automatically updates the UI【543652055253700†L279-L282】."
+  },
+  {
+    "q": "What is state hoisting?",
+    "options": [
+      "Moving state from a child composable to its caller to make the child stateless and reusable",
+      "Storing all state in global variables",
+      "Keeping state inside the composable to make it self‑contained",
+      "Persisting state through device rotations"
+    ],
+    "correct": 0,
+    "why": "State hoisting moves state out of a composable, making it stateless and easier to reuse and test【543652055253700†L286-L296】."
+  },
+  {
+    "q": "What happens when you attach multiple modifiers in a chain to a composable?",
+    "options": [
+      "Each modifier wraps the effects of the previous one and order matters",
+      "Only the last modifier has any effect",
+      "Modifiers are applied in random order",
+      "Modifiers are ignored if more than two are used"
+    ],
+    "correct": 0,
+    "why": "Modifiers called in a chain wrap the effects of previous modifiers; the order of modifiers matters【543652055253700†L242-L245】."
+  },
+  {
+    "q": "Which of the following is true about UI state in Jetpack Compose?",
+    "options": [
+      "The UI is immutable and re‑created when the state changes",
+      "The UI can be mutated directly",
+      "State changes are ignored by the UI",
+      "UI state is always global"
+    ],
+    "correct": 0,
+    "why": "The slides state that the UI is immutable; what changes is the state, which triggers recomposition to update the UI【543652055253700†L259-L265】."
+  },
+  {
+    "q": "Which of these describes a stateless composable?",
+    "options": [
+      "A composable that does not hold state and relies on parameters for data",
+      "A composable that stores data in a global variable",
+      "A composable that uses mutableStateOf internally",
+      "A composable that cannot accept parameters"
+    ],
+    "correct": 0,
+    "why": "Stateless composables do not hold state; instead, they take state and event handlers as parameters【543652055253700†L286-L296】."
+  },
+  {
+    "q": "Which Compose function allows you to preview a composable in Android Studio?",
+    "options": [
+      "@Preview",
+      "@Composable",
+      "@Inject",
+      "@MainActivity"
+    ],
+    "correct": 0,
+    "why": "The slides mention that @Preview can be used to preview composables in Android Studio【543652055253700†L166-L170】."
+  },
+  {
+    "q": "How does Compose treat UI elements internally?",
+    "options": [
+      "As a hierarchical tree of composables",
+      "As a flat list of views",
+      "As independent modules with no hierarchy",
+      "As XML nodes only"
+    ],
+    "correct": 0,
+    "why": "Compose constructs a UI tree where each element (e.g., Text, Column) is nested within others【543652055253700†L178-L190】."
+  },
+  {
+    "q": "Which layout arranges children horizontally in Compose?",
+    "options": [
+      "Row",
+      "Column",
+      "Box",
+      "Scaffold"
+    ],
+    "correct": 0,
+    "why": "Row arranges children side by side, while Column arranges them vertically and Box layers them【543652055253700†L178-L190】."
+  },
+  {
+    "q": "Which function stores a value across recompositions, but does not survive configuration changes?",
+    "options": [
+      "remember",
+      "rememberSaveable",
+      "mutableStateOf",
+      "liveData"
+    ],
+    "correct": 0,
+    "why": "`remember` stores a value in memory across recompositions; configuration changes require rememberSaveable or ViewModel【543652055253700†L279-L282】."
+  },
+  {
+    "q": "Which component should not be passed into a ViewModel for navigation purposes?",
+    "options": [
+      "NavController",
+      "State",
+      "MutableState",
+      "Int"
+    ],
+    "correct": 0,
+    "why": "Later lectures emphasize that the NavController should not be passed into ViewModels; state should drive navigation instead【285262186379052†L180-L184】."
+  },
+  {
+    "q": "Which Compose modifier would you use to handle click events on a Box?",
+    "options": [
+      "Modifier.clickable { /* ... */ }",
+      "Modifier.padding(16.dp)",
+      "Modifier.fillMaxSize()",
+      "Modifier.background(Color.Red)"
+    ],
+    "correct": 0,
+    "why": "Modifiers can add high‑level interactions; clickable() makes a composable respond to click events【543652055253700†L229-L236】."
+  },
+  {
+    "q": "What happens if a composable calls different composables during recomposition?",
+    "options": [
+      "Compose identifies which composables were called and avoids recomposing those whose inputs haven't changed",
+      "Compose recomposes every element in the UI tree regardless of changes",
+      "An exception is thrown",
+      "The app closes"
+    ],
+    "correct": 0,
+    "why": "During recomposition, Compose tracks which composables were invoked and skips recomposing those whose inputs haven't changed【543652055253700†L216-L221】."
+  }
+];
+    // --- Quiz Logic (DO NOT MODIFY) ---
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const percentEl = document.getElementById('percent');
+    const resetBtn = document.getElementById('resetBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    let state = { score: 0, answered: 0 };
+    let currentQuestions = [];
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    function buildQuestions() {
+      return shuffle(QUESTIONS).map(q => (({
+        q: q.q,
+        options: shuffle(q.options.map((txt, i) => ({ txt, isCorrect: i === q.correct }))),
+        correct: 0,
+        why: q.why,
+        __answered: false
+      }))).map(item => {
+        item.correct = item.options.findIndex(o => o.isCorrect);
+        item.options = item.options.map(o => o.txt);
+        return item;
+      });
+    }
+    function render() {
+      quizEl.innerHTML = '';
+      currentQuestions.forEach((item, qi) => {
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        const head = document.createElement('div');
+        head.className = 'qhead';
+        const titleEl = document.createElement('p');
+        titleEl.className = 'qtitle';
+        titleEl.textContent = `${qi + 1}. ${item.q}`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = `Q${qi + 1}`;
+        head.appendChild(titleEl);
+        head.appendChild(badge);
+        card.appendChild(head);
+        const opts = document.createElement('div');
+        opts.className = 'opts';
+        item.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'opt';
+          row.setAttribute('data-q', qi);
+          row.setAttribute('data-o', oi);
+          const letter = document.createElement('div');
+          letter.className = 'letter';
+          letter.textContent = String.fromCharCode(65 + oi);
+          const span = document.createElement('span');
+          span.innerHTML = opt;
+          row.appendChild(letter);
+          row.appendChild(span);
+          row.addEventListener('click', onChoose);
+          opts.appendChild(row);
+        });
+        const exp = document.createElement('div');
+        exp.className = 'exp';
+        exp.hidden = true;
+        exp.innerHTML = `<strong>Explanation:</strong> ${item.why}`;
+        card.appendChild(opts);
+        card.appendChild(exp);
+        quizEl.appendChild(card);
+      });
+      updateStats();
+    }
+    function onChoose(e) {
+      const btn = e.currentTarget;
+      const qIndex = +btn.getAttribute('data-q');
+      const oIndex = +btn.getAttribute('data-o');
+      const card = btn.closest('.qcard');
+      const exp = card.querySelector('.exp');
+      const data = currentQuestions[qIndex];
+      if (data.__answered) return;
+      const options = card.querySelectorAll('.opt');
+      options.forEach(b => b.classList.add('disabled'));
+      data.__answered = true;
+      state.answered++;
+      if (oIndex === data.correct) {
+        btn.classList.add('correct');
+        state.score++;
+      } else {
+        btn.classList.add('wrong');
+        options[data.correct].classList.add('correct');
+      }
+      exp.hidden = false;
+      updateStats();
+    }
+    function updateStats() {
+      scoreEl.textContent = `Score: ${state.score}`;
+      progressEl.textContent = `Answered: ${state.answered} / ${currentQuestions.length}`;
+      const pct = currentQuestions.length ? Math.round((state.score/currentQuestions.length)*100) : 0;
+      percentEl.textContent = `${pct}%`;
+    }
+    function revealAll() {
+      document.querySelectorAll('.qcard').forEach((card, qi) => {
+        const data = currentQuestions[qi];
+        const exp = card.querySelector('.exp');
+        const options = card.querySelectorAll('.opt');
+        options.forEach((b, oi) => {
+          b.classList.remove('wrong');
+          if (oi === data.correct) b.classList.add('correct');
+          b.classList.add('disabled');
+        });
+        data.__answered = true;
+        exp.hidden = false;
+      });
+    }
+    function resetQuiz() {
+      state.score = 0; state.answered = 0;
+      render();
+    }
+    function shuffleQuiz() {
+      state.score = 0; state.answered = 0;
+      currentQuestions = buildQuestions();
+      render();
+    }
+    resetBtn.addEventListener('click', resetQuiz);
+    revealBtn.addEventListener('click', revealAll);
+    shuffleBtn.addEventListener('click', shuffleQuiz);
+    currentQuestions = buildQuestions();
+    render();
+  </script>
+</body>
+</html>

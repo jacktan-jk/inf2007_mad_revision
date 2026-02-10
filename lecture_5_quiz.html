@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2007 – Lecture 5 MCQ Quiz: Navigation & ViewModel</title>
+  <style>
+    :root { --maxw: 980px; --accent: #0f766e; --muted:#6b7280; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", sans-serif; line-height: 1.45; margin: 0; background: #f7f7f8;
+    color:#111827; }
+    header { background: white; border-bottom: 1px solid #e5e7eb; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 18px 16px; }
+    h1 { font-size: clamp(20px, 2.6vw, 28px); margin: 0 0 6px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
+    button { cursor:pointer; border:1px solid #e5e7eb; background:white;
+    padding:8px 12px; border-radius:10px; font-weight:600; }
+    button.primary { background: var(--accent); color: white; border-color:
+    var(--accent); }
+    button:disabled { opacity:.6; cursor:not-allowed }
+    .stats { display:flex; gap:18px; align-items:center; margin-top:10px; }
+    .pill { background:#eef2ff; color:#3730a3; font-weight:700; padding:6px
+    10px; border-radius:999px; }
+    main { max-width: var(--maxw); margin: 12px auto 60px; padding: 0 16px; }
+    .qcard { background:white; border:1px solid #e5e7eb; border-radius:14px;
+    padding:14px; margin:14px 0; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+    .qhead { display:flex; justify-content:space-between; align-items:baseline;
+    gap:6px }
+    .qtitle { font-weight:700; margin:0 0 8px }
+    .badge { font-size:12px; color:#374151; background:#f3f4f6; border:1px
+    solid #e5e7eb; padding:2px 8px; border-radius:999px }
+    .opts { display:grid; gap:8px; margin-top:8px }
+    .opt { display:flex; gap:10px; align-items:flex-start; padding:10px;
+    border:1px solid #e5e7eb; border-radius:12px; background:white; cursor:pointer; }
+    .opt:hover { border-color:#c7d2fe; }
+    .opt.correct { border-color:#16a34a; background:#f0fdf4; }
+    .opt.wrong { border-color:#dc2626; background:#fef2f2; }
+    .opt.disabled { pointer-events:none; opacity:.8 }
+    .letter { width:28px; height:28px; border-radius:999px; border:1px
+    solid #e5e7eb; display:grid; place-items:center; font-weight:700; }
+    .exp { margin-top:10px; border-top:1px dashed #e5e7eb; padding-top:10px;
+    color:#111827; }
+    .exp strong { color:#065f46 }
+    footer { text-align:center; color:#6b7280; padding:30px 12px; }
+    details > summary { cursor:pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2007 – Lecture 5 MCQ Quiz: Navigation & ViewModel</h1>
+      <div class="sub">INF2007 – Mobile Application Development • Lecture 5</div>
+      <div class="stats" id="stats">
+        <span class="pill" id="score">Score: 0</span>
+        <span class="pill" id="progress">Answered: 0 / 0</span>
+        <span class="pill" id="percent">0%</span>
+      </div>
+      <div class="controls">
+        <button class="primary" id="resetBtn" title="Reset the quiz to try again">Reset quiz</button>
+        <button id="revealBtn" title="Reveal correct answers for all questions">Reveal all answers</button>
+        <button id="shuffleBtn" title="Shuffle questions and answer options">Shuffle</button>
+      </div>
+    </div>
+  </header>
+  <main id="quiz"></main>
+  <footer>
+    Based on lecture material. This educational quiz is for practice.
+  </footer>
+  <script>
+    const QUESTIONS = [
+  {
+    "q": "What advantage does nested navigation offer in Jetpack Navigation?",
+    "options": [
+      "It organizes app flows into parent‑child graphs for modularity",
+      "It eliminates the need for NavController",
+      "It forces all routes into a single graph",
+      "It disables deep links"
+    ],
+    "correct": 0,
+    "why": "Nested navigation allows different sections of the app to be organized into separate graphs, improving modularity【285262186379052†L46-L53】."
+  },
+  {
+    "q": "What is a deep link in the context of Android navigation?",
+    "options": [
+      "A way to navigate directly to a specific screen from outside the app",
+      "A link to a website unrelated to the app",
+      "A method of encrypting navigation routes",
+      "A type of database query"
+    ],
+    "correct": 0,
+    "why": "Deep links allow users to jump straight to a specific screen (e.g., from a notification) by defining URI patterns in NavHost and the manifest【285262186379052†L55-L63】."
+  },
+  {
+    "q": "How do you register a deep link in Jetpack Compose Navigation?",
+    "options": [
+      "Use the navDeepLink function with a uriPattern inside the composable route definition",
+      "Write the URL in the AndroidManifest only",
+      "Call navController.deepLink() at runtime",
+      "Create an external XML file"
+    ],
+    "correct": 0,
+    "why": "navDeepLink() associates a URI pattern with a specific composable destination【285262186379052†L66-L72】."
+  },
+  {
+    "q": "What is required to support dynamic deep link arguments in a route?",
+    "options": [
+      "Include a placeholder (e.g., {username}) in the route pattern",
+      "Define an enum for all possible values",
+      "Create a separate Activity per argument",
+      "Use a global static variable"
+    ],
+    "correct": 0,
+    "why": "Dynamic deep linking requires specifying placeholders (e.g., {username}) in the route pattern to capture parameters【285262186379052†L74-L78】."
+  },
+  {
+    "q": "How can you trigger a deep link within your own app?",
+    "options": [
+      "Attach a PendingIntent containing the deep link URI to a notification or button",
+      "Call navController.navigate() with no arguments",
+      "Set a flag in the ViewModel",
+      "Modify the AndroidManifest at runtime"
+    ],
+    "correct": 0,
+    "why": "To trigger a deep link internally, attach a deepLinkPendingIntent to a notification, button or event【285262186379052†L80-L83】."
+  },
+  {
+    "q": "Why should you avoid passing NavController into a ViewModel?",
+    "options": [
+      "To keep the ViewModel independent of the Android framework and maintain unidirectional data flow",
+      "Because NavController does not work in Compose",
+      "Because ViewModel cannot call functions",
+      "There is no reason to avoid it"
+    ],
+    "correct": 0,
+    "why": "The slides emphasize separating logic from layout and keeping ViewModels unaware of the framework; state should drive navigation, not a NavController reference【285262186379052†L132-L142】【285262186379052†L180-L184】."
+  },
+  {
+    "q": "What lifecycle property of ViewModels allows them to survive configuration changes such as screen rotations?",
+    "options": [
+      "They are tied to the lifecycle of their owning scope and survive recreation until the scope is destroyed",
+      "They are recreated every time the composable is recomposed",
+      "They are destroyed when the Activity is paused",
+      "They live forever, even if the user leaves the app"
+    ],
+    "correct": 0,
+    "why": "ViewModels live as long as their scope (e.g., NavBackStackEntry) remains in memory; they survive configuration changes and are cleared only when the scope is destroyed【285262186379052†L147-L155】."
+  },
+  {
+    "q": "What is the ViewModel factory responsible for?",
+    "options": [
+      "Caching and reusing the ViewModel instance when requested during recomposition",
+      "Creating new Activities",
+      "Serializing navigation state",
+      "Replacing the need for rememberSaveable"
+    ],
+    "correct": 0,
+    "why": "The ViewModel factory caches the instance of a ViewModel so that multiple requests during recomposition return the same instance【285262186379052†L160-L165】."
+  },
+  {
+    "q": "Which statement about `remember` and ViewModels is correct?",
+    "options": [
+      "`remember` stores values for the lifetime of a composition, while ViewModel stores state across configuration changes",
+      "Both remember and ViewModel persist state across process death",
+      "ViewModel can be used only within activities, not in composables",
+      "remember always persists state across activity recreation"
+    ],
+    "correct": 0,
+    "why": "remember stores values during a composition but does not persist through configuration changes, whereas ViewModel persists state across configuration changes【285262186379052†L124-L130】【285262186379052†L147-L155】."
+  },
+  {
+    "q": "How should you share state across multiple screens in a navigation graph?",
+    "options": [
+      "Hoist the ViewModel to a parent scope that outlives individual screens",
+      "Use a separate ViewModel for each screen even when they share data",
+      "Store the state in a global variable",
+      "Pass the state via Intent extras on every navigation action"
+    ],
+    "correct": 0,
+    "why": "Sharing state across screens is achieved by scoping the ViewModel to a parent (e.g., Activity or NavGraph) that outlives individual destinations【285262186379052†L193-L196】."
+  },
+  {
+    "q": "Which API helps persist complex UI state beyond primitives when rememberSaveable falls short?",
+    "options": [
+      "ViewModel",
+      "remember",
+      "mutableStateOf",
+      "Room database"
+    ],
+    "correct": 0,
+    "why": "rememberSaveable works well for primitives but more complex logic or navigation state should be stored in a ViewModel【285262186379052†L124-L130】【285262186379052†L132-L142】."
+  },
+  {
+    "q": "What pattern should you follow when using state and events with ViewModel and Compose?",
+    "options": [
+      "Unidirectional data flow: UI reads state from ViewModel and dispatches events to ViewModel",
+      "Two‑way binding where UI and ViewModel update each other directly",
+      "Random state mutations in any part of the app",
+      "Global mutable state without encapsulation"
+    ],
+    "correct": 0,
+    "why": "The slides advocate unidirectional data flow: UI observes state from ViewModel and sends events back, without ViewModel depending on UI objects【285262186379052†L132-L142】."
+  },
+  {
+    "q": "Which function obtains a ViewModel instance scoped to the current NavBackStackEntry in Compose?",
+    "options": [
+      "viewModel()",
+      "rememberViewModel()",
+      "getViewModel()",
+      "NavController.getViewModel()"
+    ],
+    "correct": 0,
+    "why": "The viewModel() function provides a ViewModel instance scoped to the current navigation back stack entry, caching it for reuse【285262186379052†L160-L165】."
+  },
+  {
+    "q": "If a user navigates from ScreenA to ScreenB and increments a counter in ScreenB, what happens to the counter when the user navigates back to ScreenA using the back button?",
+    "options": [
+      "The counter value persists if the ViewModel is scoped to the shared NavGraph",
+      "The counter value always resets",
+      "A new ViewModel instance resets the counter",
+      "The counter doubles in value"
+    ],
+    "correct": 0,
+    "why": "Scoping a ViewModel to a parent graph or activity allows state (like a counter) to persist across screens and survive back navigation【285262186379052†L193-L196】."
+  },
+  {
+    "q": "Why is `mutableStateOf` still used inside a ViewModel?",
+    "options": [
+      "It bridges the ViewModel’s Kotlin state with Compose’s reactive system",
+      "It automatically saves state to disk",
+      "It creates new activities",
+      "It is the only way to store integers"
+    ],
+    "correct": 0,
+    "why": "mutableStateOf bridges ViewModel state to Compose; when the value changes, Compose observes the state and recomposes【285262186379052†L167-L170】."
+  },
+  {
+    "q": "Which of the following best describes unidirectional data flow in the context of Compose and ViewModel?",
+    "options": [
+      "The UI reads state from the ViewModel and sends events back; the ViewModel outputs new state",
+      "UI and ViewModel mutually mutate each other’s state",
+      "Data flows in a cycle where state is pushed from UI to ViewModel and back simultaneously",
+      "Events are ignored and state is static"
+    ],
+    "correct": 0,
+    "why": "Unidirectional data flow means that the UI reads state from the ViewModel and dispatches events back; the ViewModel processes events and emits new state【285262186379052†L132-L142】."
+  },
+  {
+    "q": "What happens to a ViewModel when its owning navigation scope is popped off the back stack?",
+    "options": [
+      "The ViewModel is cleared and its state is discarded",
+      "It persists forever",
+      "It becomes global state",
+      "It moves to the next activity"
+    ],
+    "correct": 0,
+    "why": "A ViewModel is cleared when its owning scope (NavBackStackEntry) is removed from memory, such as when the user exits the flow【285262186379052†L147-L155】."
+  },
+  {
+    "q": "Which of the following is a correct way to define a deep link URI pattern in navDeepLink?",
+    "options": [
+      "navDeepLink(uriPattern = \"https://example.com/profile/{username}\")",
+      "navDeepLink(uriPattern = \"/profile\")",
+      "navDeepLink(uri = \"profile?user={username}\")",
+      "navDeepLink(pattern = \"example.com\")"
+    ],
+    "correct": 0,
+    "why": "The slides show defining a deep link with a uriPattern containing a placeholder for a dynamic argument【285262186379052†L74-L78】."
+  },
+  {
+    "q": "What is the purpose of a PendingIntent used with deep links?",
+    "options": [
+      "It encapsulates an Intent that will be executed later, such as when a notification is tapped",
+      "It forces navigation to occur immediately",
+      "It saves state to a database",
+      "It automatically creates a NavController"
+    ],
+    "correct": 0,
+    "why": "Triggering a deep link often involves attaching a PendingIntent containing the deep link URI to a notification or button【285262186379052†L80-L83】."
+  },
+  {
+    "q": "Why might rememberSaveable be insufficient for complex navigation state?",
+    "options": [
+      "Because it only persists primitive types and simple data structures; complex logic should reside in a ViewModel",
+      "Because it persists state across process death automatically",
+      "Because it cannot save strings",
+      "Because it is deprecated"
+    ],
+    "correct": 0,
+    "why": "The slides note that rememberSaveable works well for primitives but fails on complex logic or navigation, which should be managed by a ViewModel【285262186379052†L124-L130】."
+  }
+];
+    // --- Quiz Logic (DO NOT MODIFY) ---
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const percentEl = document.getElementById('percent');
+    const resetBtn = document.getElementById('resetBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    let state = { score: 0, answered: 0 };
+    let currentQuestions = [];
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    function buildQuestions() {
+      return shuffle(QUESTIONS).map(q => (({
+        q: q.q,
+        options: shuffle(q.options.map((txt, i) => ({ txt, isCorrect: i === q.correct }))),
+        correct: 0,
+        why: q.why,
+        __answered: false
+      }))).map(item => {
+        item.correct = item.options.findIndex(o => o.isCorrect);
+        item.options = item.options.map(o => o.txt);
+        return item;
+      });
+    }
+    function render() {
+      quizEl.innerHTML = '';
+      currentQuestions.forEach((item, qi) => {
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        const head = document.createElement('div');
+        head.className = 'qhead';
+        const titleEl = document.createElement('p');
+        titleEl.className = 'qtitle';
+        titleEl.textContent = `${qi + 1}. ${item.q}`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = `Q${qi + 1}`;
+        head.appendChild(titleEl);
+        head.appendChild(badge);
+        card.appendChild(head);
+        const opts = document.createElement('div');
+        opts.className = 'opts';
+        item.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'opt';
+          row.setAttribute('data-q', qi);
+          row.setAttribute('data-o', oi);
+          const letter = document.createElement('div');
+          letter.className = 'letter';
+          letter.textContent = String.fromCharCode(65 + oi);
+          const span = document.createElement('span');
+          span.innerHTML = opt;
+          row.appendChild(letter);
+          row.appendChild(span);
+          row.addEventListener('click', onChoose);
+          opts.appendChild(row);
+        });
+        const exp = document.createElement('div');
+        exp.className = 'exp';
+        exp.hidden = true;
+        exp.innerHTML = `<strong>Explanation:</strong> ${item.why}`;
+        card.appendChild(opts);
+        card.appendChild(exp);
+        quizEl.appendChild(card);
+      });
+      updateStats();
+    }
+    function onChoose(e) {
+      const btn = e.currentTarget;
+      const qIndex = +btn.getAttribute('data-q');
+      const oIndex = +btn.getAttribute('data-o');
+      const card = btn.closest('.qcard');
+      const exp = card.querySelector('.exp');
+      const data = currentQuestions[qIndex];
+      if (data.__answered) return;
+      const options = card.querySelectorAll('.opt');
+      options.forEach(b => b.classList.add('disabled'));
+      data.__answered = true;
+      state.answered++;
+      if (oIndex === data.correct) {
+        btn.classList.add('correct');
+        state.score++;
+      } else {
+        btn.classList.add('wrong');
+        options[data.correct].classList.add('correct');
+      }
+      exp.hidden = false;
+      updateStats();
+    }
+    function updateStats() {
+      scoreEl.textContent = `Score: ${state.score}`;
+      progressEl.textContent = `Answered: ${state.answered} / ${currentQuestions.length}`;
+      const pct = currentQuestions.length ? Math.round((state.score/currentQuestions.length)*100) : 0;
+      percentEl.textContent = `${pct}%`;
+    }
+    function revealAll() {
+      document.querySelectorAll('.qcard').forEach((card, qi) => {
+        const data = currentQuestions[qi];
+        const exp = card.querySelector('.exp');
+        const options = card.querySelectorAll('.opt');
+        options.forEach((b, oi) => {
+          b.classList.remove('wrong');
+          if (oi === data.correct) b.classList.add('correct');
+          b.classList.add('disabled');
+        });
+        data.__answered = true;
+        exp.hidden = false;
+      });
+    }
+    function resetQuiz() {
+      state.score = 0; state.answered = 0;
+      render();
+    }
+    function shuffleQuiz() {
+      state.score = 0; state.answered = 0;
+      currentQuestions = buildQuestions();
+      render();
+    }
+    resetBtn.addEventListener('click', resetQuiz);
+    revealBtn.addEventListener('click', revealAll);
+    shuffleBtn.addEventListener('click', shuffleQuiz);
+    currentQuestions = buildQuestions();
+    render();
+  </script>
+</body>
+</html>

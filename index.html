@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2007 – Quizzes & Notes</title>
+  <style>
+    :root { --maxw:1100px; --accent:#111827; --brand:#2563eb; --muted:#6b7280; }
+    * { box-sizing:border-box }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif; line-height:1.5; margin:0; background:#0b1220; color:#e5e7eb; }
+    header { border-bottom:1px solid #1f2937; background:linear-gradient(180deg,#0b1220,#0b1220 60%,#0e1628); }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:18px 16px; }
+    h1 { margin:0 0 6px; font-size:clamp(20px,2.6vw,28px); }
+    .sub { color:#9ca3af; font-size:14px }
+    main { max-width:var(--maxw); margin:16px auto 40px; padding:0 16px; display:grid; grid-template-columns: 1.1fr .9fr; gap:18px }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr } }
+    .card { background:#0f172a; border:1px solid #1f2937; border-radius:14px; padding:14px; box-shadow:0 1px 0 rgba(0,0,0,.35) }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px }
+    .grid[hidden] { display:none }
+    .tabs { display:flex; gap:8px; margin:10px 0 14px; flex-wrap:wrap }
+    .tab { border:1px solid #1f2937; background:#0b1328; color:#9ca3af; padding:6px 12px; border-radius:999px; font-weight:600; cursor:pointer }
+    .tab.active { background:#1e293b; border-color:#3b82f6; color:#e6f0ff }
+    .lec { display:flex; flex-direction:column; gap:10px; padding:12px; border:1px solid #1f2937; border-radius:12px; background:#0b1328 }
+    .lec h3 { margin:0; font-size:16px }
+    .lec .tag { color:#93c5fd; font-size:12px }
+    .btns { display:flex; gap:8px; flex-wrap:wrap }
+    a.btn, button.btn { appearance:none; text-decoration:none; cursor:pointer; border:1px solid #1f2937; background:#111827; color:#e5e7eb; padding:8px 12px; border-radius:10px; font-weight:600; font-size:14px }
+    a.btn.primary, button.btn.primary { background:#1e293b; border-color:#3b82f6; color:#e6f0ff }
+    a.btn:hover, button.btn:hover { border-color:#3b82f6 }
+    details { margin-top:10px; color:#9ca3af }
+    details > summary { cursor:pointer }
+    /* Notes viewer */
+    .notes { display:flex; flex-direction:column; gap:10px }
+    .notes header { background:transparent; border:0; padding:0 }
+    .notes h2 { margin:0 0 4px; font-size:18px }
+    .notes .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+    .notes input[type=text] { flex:1; min-width:160px; background:#0b1328; color:#e5e7eb; border:1px solid #1f2937; border-radius:10px; padding:8px 10px }
+    .notes article { min-height:280px; max-height:70vh; overflow:auto; padding:12px; border:1px solid #1f2937; border-radius:12px; background:#0b1328 }
+    /* Simple markdown styles */
+    .md h1,.md h2,.md h3,.md h4,.md h5 { margin:.6em 0 .3em }
+    .md h1{font-size:22px}.md h2{font-size:20px}.md h3{font-size:18px}
+    .md p { margin:.5em 0 }
+    .md code { background:#0a1020; border:1px solid #1f2937; padding:.1em .3em; border-radius:6px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace }
+    .md pre { background:#0a1020; border:1px solid #1f2937; padding:10px; border-radius:10px; overflow:auto }
+    .md ul { margin:.4em 0 .6em 1.2em }
+    .md li { margin:.2em 0 }
+    /* Fullscreen styles */
+    #mdOut:fullscreen { 
+      background:#0b1328; 
+      border:none; 
+      width:100vw; 
+      height:100vh; 
+      max-height:none; 
+      padding:20px; 
+      border-radius:0; 
+      box-sizing:border-box; 
+    }
+    #mdOut:fullscreen .md h1{font-size:26px}
+    #mdOut:fullscreen .md h2{font-size:22px}
+    #mdOut:fullscreen .md h3{font-size:20px}
+    #mdOut:fullscreen p{font-size:16px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2007 — Quizzes & Revision Notes</h1>
+      <div class="sub">Mobile Application Development • Quick links to quizzes • Lightweight Markdown viewer for notes</div>
+    </div>
+  </header>
+  <main>
+    <section class="card">
+      <h2 style="margin-top:0">Quizzes</h2>
+      <div class="grid" id="quizGrid"></div>
+      <details>
+        <summary>File naming convention (keep projects portable)</summary>
+        <div style="margin-top:6px">
+          Save each quiz HTML beside this index with consistent naming.<br>
+          Example: <code>lecture_1_quiz.html</code>, <code>lecture_2_quiz.html</code>, etc.<br>
+          Place Markdown notes in a <code>notes/</code> folder.
+        </div>
+      </details>
+    </section>
+    <section class="card notes">
+      <header>
+        <h2>Markdown Notes Viewer</h2>
+        <div class="bar">
+          <input id="mdPath" type="text" placeholder="notes/lec1.md" />
+          <button class="btn primary" id="loadBtn" title="Fetch and render the Markdown file">Load</button>
+          <input type="file" id="filePick" accept=".md,.txt,.markdown" style="display:none" />
+          <button class="btn" id="pickBtn" title="Preview a local .md without hosting">Open .md file…</button>
+          <button class="btn" id="fsBtn" title="Toggle fullscreen for the notes viewer">⛶</button>
+        </div>
+      </header>
+      <article id="mdOut" class="md">
+        <p style="color:#6b7280">Type a path or pick a file to preview Markdown notes.</p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    // --- Quiz Configuration ---
+    const QUIZZES = [
+      { num: 1, title: "Introduction & Kotlin", desc: "INF2007 – Mobile Application Development • Lecture 1", file: "lecture_1_quiz.html", notes: "notes/lec1.md" },
+      { num: 2, title: "Android Platform & App Fundamentals", desc: "INF2007 – Mobile Application Development • Lecture 2", file: "lecture_2_quiz.html", notes: "notes/lec2.md" },
+      { num: 3, title: "Jetpack Compose", desc: "INF2007 – Mobile Application Development • Lecture 3", file: "lecture_3_quiz.html", notes: "notes/lec3.md" },
+      { num: 4, title: "State Management & Navigation", desc: "INF2007 – Mobile Application Development • Lecture 4", file: "lecture_4_quiz.html", notes: "notes/lec4.md" },
+      { num: 5, title: "Navigation & ViewModel", desc: "INF2007 – Mobile Application Development • Lecture 5", file: "lecture_5_quiz.html", notes: "notes/lec5.md" },
+    ];
+
+    // --- Render Quiz Cards ---
+    function renderQuizzes() {
+      const grid = document.getElementById('quizGrid');
+      grid.innerHTML = '';
+      
+      QUIZZES.forEach(quiz => {
+        const card = document.createElement('div');
+        card.className = 'lec';
+        card.innerHTML = `
+          <div>
+            <h3>${quiz.title}</h3>
+            <div class="tag">Lecture ${quiz.num}</div>
+          </div>
+          <p style="margin:0;color:#9ca3af;font-size:14px">${quiz.desc}</p>
+          <div class="btns">
+            <a href="${quiz.file}" target="_blank" class="btn primary">Start Quiz</a>
+            ${quiz.notes ? `<button class="btn" onclick="loadNotes('${quiz.notes}')">View Notes</button>` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    renderQuizzes();
+
+    // --- Markdown Viewer ---
+    const mdPath = document.getElementById('mdPath');
+    const mdOut = document.getElementById('mdOut');
+    const loadBtn = document.getElementById('loadBtn');
+    const pickBtn = document.getElementById('pickBtn');
+    const filePick = document.getElementById('filePick');
+    const fsBtn = document.getElementById('fsBtn');
+
+    // Simple markdown parser (basic support)
+    function parseMarkdown(md) {
+      let html = md
+        // Headers
+        .replace(/^##### (.*$)/gim, '<h5>$1</h5>')
+        .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.*?)__/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/_(.*?)_/g, '<em>$1</em>')
+        // Code blocks
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Links
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+        // Lists
+        .replace(/^\* (.*$)/gim, '<li>$1</li>')
+        .replace(/^- (.*$)/gim, '<li>$1</li>')
+        // Line breaks
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+
+      // Wrap lists
+      html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+      
+      return `<p>${html}</p>`;
+    }
+
+    // Load notes function (can be called from quiz cards)
+    window.loadNotes = function(path) {
+      mdPath.value = path;
+      loadBtn.click();
+    };
+
+    loadBtn.addEventListener('click', async () => {
+      const path = mdPath.value.trim();
+      if (!path) return;
+      
+      try {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const md = await res.text();
+        mdOut.innerHTML = parseMarkdown(md);
+      } catch (err) {
+        mdOut.innerHTML = `<p style="color:#ef4444">Error loading ${path}: ${err.message}</p>`;
+      }
+    });
+
+    pickBtn.addEventListener('click', () => filePick.click());
+
+    filePick.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = ev => {
+        mdOut.innerHTML = parseMarkdown(ev.target.result);
+        mdPath.value = file.name;
+      };
+      reader.readAsText(file);
+    });
+
+    fsBtn.addEventListener('click', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        mdOut.requestFullscreen().catch(err => {
+          console.warn('Fullscreen failed:', err);
+        });
+      }
+    });
+
+    // Allow Enter key to load
+    mdPath.addEventListener('keypress', e => {
+      if (e.key === 'Enter') loadBtn.click();
+    });
+  </script>
+</body>
+</html>

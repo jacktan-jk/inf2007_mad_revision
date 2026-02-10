@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2007 – Lecture 4 MCQ Quiz: State Management & Navigation</title>
+  <style>
+    :root { --maxw: 980px; --accent: #0f766e; --muted:#6b7280; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", sans-serif; line-height: 1.45; margin: 0; background: #f7f7f8;
+    color:#111827; }
+    header { background: white; border-bottom: 1px solid #e5e7eb; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 18px 16px; }
+    h1 { font-size: clamp(20px, 2.6vw, 28px); margin: 0 0 6px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
+    button { cursor:pointer; border:1px solid #e5e7eb; background:white;
+    padding:8px 12px; border-radius:10px; font-weight:600; }
+    button.primary { background: var(--accent); color: white; border-color:
+    var(--accent); }
+    button:disabled { opacity:.6; cursor:not-allowed }
+    .stats { display:flex; gap:18px; align-items:center; margin-top:10px; }
+    .pill { background:#eef2ff; color:#3730a3; font-weight:700; padding:6px
+    10px; border-radius:999px; }
+    main { max-width: var(--maxw); margin: 12px auto 60px; padding: 0 16px; }
+    .qcard { background:white; border:1px solid #e5e7eb; border-radius:14px;
+    padding:14px; margin:14px 0; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+    .qhead { display:flex; justify-content:space-between; align-items:baseline;
+    gap:6px }
+    .qtitle { font-weight:700; margin:0 0 8px }
+    .badge { font-size:12px; color:#374151; background:#f3f4f6; border:1px
+    solid #e5e7eb; padding:2px 8px; border-radius:999px }
+    .opts { display:grid; gap:8px; margin-top:8px }
+    .opt { display:flex; gap:10px; align-items:flex-start; padding:10px;
+    border:1px solid #e5e7eb; border-radius:12px; background:white; cursor:pointer; }
+    .opt:hover { border-color:#c7d2fe; }
+    .opt.correct { border-color:#16a34a; background:#f0fdf4; }
+    .opt.wrong { border-color:#dc2626; background:#fef2f2; }
+    .opt.disabled { pointer-events:none; opacity:.8 }
+    .letter { width:28px; height:28px; border-radius:999px; border:1px
+    solid #e5e7eb; display:grid; place-items:center; font-weight:700; }
+    .exp { margin-top:10px; border-top:1px dashed #e5e7eb; padding-top:10px;
+    color:#111827; }
+    .exp strong { color:#065f46 }
+    footer { text-align:center; color:#6b7280; padding:30px 12px; }
+    details > summary { cursor:pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2007 – Lecture 4 MCQ Quiz: State Management & Navigation</h1>
+      <div class="sub">INF2007 – Mobile Application Development • Lecture 4</div>
+      <div class="stats" id="stats">
+        <span class="pill" id="score">Score: 0</span>
+        <span class="pill" id="progress">Answered: 0 / 0</span>
+        <span class="pill" id="percent">0%</span>
+      </div>
+      <div class="controls">
+        <button class="primary" id="resetBtn" title="Reset the quiz to try again">Reset quiz</button>
+        <button id="revealBtn" title="Reveal correct answers for all questions">Reveal all answers</button>
+        <button id="shuffleBtn" title="Shuffle questions and answer options">Shuffle</button>
+      </div>
+    </div>
+  </header>
+  <main id="quiz"></main>
+  <footer>
+    Based on lecture material. This educational quiz is for practice.
+  </footer>
+  <script>
+    const QUESTIONS = [
+  {
+    "q": "What is the difference between a stateful and a stateless composable?",
+    "options": [
+      "Stateful composables hold their own state; stateless composables rely on external state",
+      "Stateful composables cannot take parameters; stateless ones can",
+      "Stateless composables never recompose",
+      "There is no difference"
+    ],
+    "correct": 0,
+    "why": "The slides define stateful composables as those that hold state internally, whereas stateless composables rely on their callers to manage state【543652055253700†L286-L296】."
+  },
+  {
+    "q": "What is state hoisting?",
+    "options": [
+      "Moving state from a child composable to its parent to make the child stateless",
+      "Persisting state using rememberSaveable",
+      "Storing state in a global variable",
+      "Caching a value for reuse"
+    ],
+    "correct": 0,
+    "why": "State hoisting involves moving state up to the parent so that the child composable becomes stateless and reusable【543652055253700†L286-L296】."
+  },
+  {
+    "q": "Which functions are used to create observable state values in Compose?",
+    "options": [
+      "remember and mutableStateOf",
+      "getState and setState",
+      "observe and emit",
+      "subscribe and notify"
+    ],
+    "correct": 0,
+    "why": "The lecture explains that `mutableStateOf` creates an observable state and `remember` stores it across recompositions【543652055253700†L279-L282】."
+  },
+  {
+    "q": "Which of the following describes an event in the event‑state‑UI cycle?",
+    "options": [
+      "An action or occurrence initiated by the user or system that triggers a state change",
+      "A piece of global state",
+      "An immutable UI component",
+      "A thread running in the background"
+    ],
+    "correct": 0,
+    "why": "Events are actions or occurrences (user or system‑generated) that trigger state changes and drive UI updates【142401871453801†L146-L179】."
+  },
+  {
+    "q": "What happens when state changes in Compose?",
+    "options": [
+      "The affected UI recomposes to reflect the new state",
+      "Nothing; the UI remains static",
+      "The entire application restarts",
+      "The app navigates back to the home screen"
+    ],
+    "correct": 0,
+    "why": "When the state changes, Compose recomposes the affected UI so that it reflects the updated state【142401871453801†L146-L179】."
+  },
+  {
+    "q": "Which Jetpack Navigation component defines the possible navigation routes and destinations?",
+    "options": [
+      "NavHost",
+      "NavController",
+      "ViewModel",
+      "MutableState"
+    ],
+    "correct": 0,
+    "why": "NavHost is used to define the navigation graph with routes and destinations for Jetpack Navigation【142401871453801†L14-L21】."
+  },
+  {
+    "q": "What does the NavController do in Jetpack Compose Navigation?",
+    "options": [
+      "Manages app navigation and back stack",
+      "Draws UI elements",
+      "Creates new activities",
+      "Provides access to hardware sensors"
+    ],
+    "correct": 0,
+    "why": "NavController manages the navigation and back stack for Jetpack Navigation; it is passed to NavHost for navigation actions【142401871453801†L14-L21】."
+  },
+  {
+    "q": "How can you navigate to a different screen using NavController?",
+    "options": [
+      "Call navController.navigate(\"routeName\")",
+      "Instantiate a new Activity with Intent",
+      "Change the state variable without calling any function",
+      "Modify the XML layout file"
+    ],
+    "correct": 0,
+    "why": "You navigate by calling navController.navigate() with the destination's route name; this adds the destination to the back stack【142401871453801†L14-L21】."
+  },
+  {
+    "q": "Which function removes screens from the back stack up to a specified destination?",
+    "options": [
+      "popUpTo()",
+      "navigate()",
+      "push()",
+      "startActivity()"
+    ],
+    "correct": 0,
+    "why": "The slides explain that popBackStack() and popUpTo() can be used to remove destinations from the back stack and navigate appropriately【142401871453801†L23-L26】."
+  },
+  {
+    "q": "What is the role of event listeners and handlers in Compose state management?",
+    "options": [
+      "They listen for events and update the state accordingly",
+      "They render UI elements directly",
+      "They replace the need for ViewModels",
+      "They define XML layout files"
+    ],
+    "correct": 0,
+    "why": "Event listeners and handlers respond to user or system events and update state variables, which then trigger recomposition【142401871453801†L162-L179】."
+  },
+  {
+    "q": "What does the `remember` function do in the context of state management?",
+    "options": [
+      "Stores state across recompositions in memory",
+      "Saves state to disk automatically",
+      "Persists state across process death",
+      "Resets state on each recomposition"
+    ],
+    "correct": 0,
+    "why": "`remember` stores a value in memory during composition and recomposition; it does not persist through process death or configuration changes【543652055253700†L279-L282】."
+  },
+  {
+    "q": "What will be the number of recompositions triggered for a TextField if a user enters four digits?",
+    "options": [
+      "Four recompositions for the TextField and four for the Text displaying the value",
+      "One recomposition for the TextField and zero for Text",
+      "Zero recompositions",
+      "Ten recompositions"
+    ],
+    "correct": 0,
+    "why": "Entering each character triggers a recomposition of the TextField and the Text composables; thus four characters result in four recompositions for each【142401871453801†L210-L213】."
+  },
+  {
+    "q": "Which parameter in TextField must be updated to reflect user input?",
+    "options": [
+      "onValueChange",
+      "value only",
+      "modifier",
+      "keyboardOptions"
+    ],
+    "correct": 0,
+    "why": "The TextField example shows that the value parameter holds state and onValueChange updates it when the user types【142401871453801†L197-L207】."
+  },
+  {
+    "q": "What is the relationship between events, state and UI in Compose?",
+    "options": [
+      "Events trigger state changes, which then cause the UI to update",
+      "State triggers events and UI controls everything",
+      "UI controls events directly and state is ignored",
+      "Events and UI are unrelated to state"
+    ],
+    "correct": 0,
+    "why": "Events (user or system) trigger state changes; the updated state triggers recomposition of the UI【142401871453801†L146-L179】."
+  },
+  {
+    "q": "What is the recommended way to pass state to a stateless composable?",
+    "options": [
+      "Pass the current state value and a lambda to update that state",
+      "Use a global mutable variable",
+      "Store the state inside the stateless composable",
+      "Use rememberSaveable inside the stateless composable"
+    ],
+    "correct": 0,
+    "why": "A stateless composable receives the state value and a callback for updating it; this enables state hoisting and reuse【543652055253700†L286-L296】."
+  },
+  {
+    "q": "When using Jetpack Navigation, what does the back button do by default?",
+    "options": [
+      "Pops the current destination off the back stack and returns to the previous destination",
+      "Closes the entire application",
+      "Recreates the activity",
+      "Starts a new task"
+    ],
+    "correct": 0,
+    "why": "Managing the back stack ensures that pressing the back button pops the current destination and returns to the previous one【142401871453801†L23-L26】."
+  },
+  {
+    "q": "What is a dynamic destination in Jetpack Navigation?",
+    "options": [
+      "A destination whose route includes arguments or parameters",
+      "A screen that cannot be navigated to",
+      "A static screen without parameters",
+      "An external web page"
+    ],
+    "correct": 0,
+    "why": "Dynamic destinations contain parameters in their route, allowing different content based on the argument【142401871453801†L14-L21】."
+  },
+  {
+    "q": "How can you prevent a child composable from modifying its own state?",
+    "options": [
+      "Hoist the state to the parent and pass down a state value and callback",
+      "Define the state as a global variable",
+      "Remove the state from the composable completely",
+      "Use a static variable inside the composable"
+    ],
+    "correct": 0,
+    "why": "State hoisting moves the state to the parent, passing the value and a callback to the child so it cannot mutate its own state directly【543652055253700†L286-L296】."
+  },
+  {
+    "q": "Which Compose API should be used when you need to persist state across configuration changes?",
+    "options": [
+      "rememberSaveable",
+      "remember",
+      "mutableStateOf",
+      "liveDataOf"
+    ],
+    "correct": 0,
+    "why": "`rememberSaveable` saves state across configuration changes such as rotations, whereas `remember` does not persist beyond the process【285262186379052†L124-L130】."
+  },
+  {
+    "q": "What is the effect of calling navController.popBackStack() without parameters?",
+    "options": [
+      "It removes the top destination from the back stack",
+      "It clears the entire back stack",
+      "It adds a new destination",
+      "It does nothing"
+    ],
+    "correct": 0,
+    "why": "popBackStack() removes the top entry from the back stack, returning to the previous destination【142401871453801†L23-L26】."
+  },
+  {
+    "q": "In Compose, what does `rememberSaveable` use under the hood to persist primitive values?",
+    "options": [
+      "SavedInstanceState",
+      "SharedPreferences",
+      "Room database",
+      "MutableState"
+    ],
+    "correct": 0,
+    "why": "rememberSaveable saves values using the SavedInstanceState mechanism to restore them after configuration changes【285262186379052†L124-L130】."
+  },
+  {
+    "q": "Why is state hoisting important for reusability?",
+    "options": [
+      "It allows the same composable to be used in different contexts because it does not own state",
+      "It hides the state inside the composable",
+      "It eliminates the need for recomposition",
+      "It prevents passing parameters to composables"
+    ],
+    "correct": 0,
+    "why": "Hoisting state to the parent makes a composable more reusable and testable because it no longer owns its own state【543652055253700†L286-L296】."
+  }
+];
+    // --- Quiz Logic (DO NOT MODIFY) ---
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const percentEl = document.getElementById('percent');
+    const resetBtn = document.getElementById('resetBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    let state = { score: 0, answered: 0 };
+    let currentQuestions = [];
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    function buildQuestions() {
+      return shuffle(QUESTIONS).map(q => (({
+        q: q.q,
+        options: shuffle(q.options.map((txt, i) => ({ txt, isCorrect: i === q.correct }))),
+        correct: 0,
+        why: q.why,
+        __answered: false
+      }))).map(item => {
+        item.correct = item.options.findIndex(o => o.isCorrect);
+        item.options = item.options.map(o => o.txt);
+        return item;
+      });
+    }
+    function render() {
+      quizEl.innerHTML = '';
+      currentQuestions.forEach((item, qi) => {
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        const head = document.createElement('div');
+        head.className = 'qhead';
+        const titleEl = document.createElement('p');
+        titleEl.className = 'qtitle';
+        titleEl.textContent = `${qi + 1}. ${item.q}`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = `Q${qi + 1}`;
+        head.appendChild(titleEl);
+        head.appendChild(badge);
+        card.appendChild(head);
+        const opts = document.createElement('div');
+        opts.className = 'opts';
+        item.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'opt';
+          row.setAttribute('data-q', qi);
+          row.setAttribute('data-o', oi);
+          const letter = document.createElement('div');
+          letter.className = 'letter';
+          letter.textContent = String.fromCharCode(65 + oi);
+          const span = document.createElement('span');
+          span.innerHTML = opt;
+          row.appendChild(letter);
+          row.appendChild(span);
+          row.addEventListener('click', onChoose);
+          opts.appendChild(row);
+        });
+        const exp = document.createElement('div');
+        exp.className = 'exp';
+        exp.hidden = true;
+        exp.innerHTML = `<strong>Explanation:</strong> ${item.why}`;
+        card.appendChild(opts);
+        card.appendChild(exp);
+        quizEl.appendChild(card);
+      });
+      updateStats();
+    }
+    function onChoose(e) {
+      const btn = e.currentTarget;
+      const qIndex = +btn.getAttribute('data-q');
+      const oIndex = +btn.getAttribute('data-o');
+      const card = btn.closest('.qcard');
+      const exp = card.querySelector('.exp');
+      const data = currentQuestions[qIndex];
+      if (data.__answered) return;
+      const options = card.querySelectorAll('.opt');
+      options.forEach(b => b.classList.add('disabled'));
+      data.__answered = true;
+      state.answered++;
+      if (oIndex === data.correct) {
+        btn.classList.add('correct');
+        state.score++;
+      } else {
+        btn.classList.add('wrong');
+        options[data.correct].classList.add('correct');
+      }
+      exp.hidden = false;
+      updateStats();
+    }
+    function updateStats() {
+      scoreEl.textContent = `Score: ${state.score}`;
+      progressEl.textContent = `Answered: ${state.answered} / ${currentQuestions.length}`;
+      const pct = currentQuestions.length ? Math.round((state.score/currentQuestions.length)*100) : 0;
+      percentEl.textContent = `${pct}%`;
+    }
+    function revealAll() {
+      document.querySelectorAll('.qcard').forEach((card, qi) => {
+        const data = currentQuestions[qi];
+        const exp = card.querySelector('.exp');
+        const options = card.querySelectorAll('.opt');
+        options.forEach((b, oi) => {
+          b.classList.remove('wrong');
+          if (oi === data.correct) b.classList.add('correct');
+          b.classList.add('disabled');
+        });
+        data.__answered = true;
+        exp.hidden = false;
+      });
+    }
+    function resetQuiz() {
+      state.score = 0; state.answered = 0;
+      render();
+    }
+    function shuffleQuiz() {
+      state.score = 0; state.answered = 0;
+      currentQuestions = buildQuestions();
+      render();
+    }
+    resetBtn.addEventListener('click', resetQuiz);
+    revealBtn.addEventListener('click', revealAll);
+    shuffleBtn.addEventListener('click', shuffleQuiz);
+    currentQuestions = buildQuestions();
+    render();
+  </script>
+</body>
+</html>

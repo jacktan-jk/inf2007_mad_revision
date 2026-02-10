@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2007 – Lecture 1 MCQ Quiz: Introduction & Kotlin</title>
+  <style>
+    :root { --maxw: 980px; --accent: #0f766e; --muted:#6b7280; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", sans-serif; line-height: 1.45; margin: 0; background: #f7f7f8;
+    color:#111827; }
+    header { background: white; border-bottom: 1px solid #e5e7eb; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 18px 16px; }
+    h1 { font-size: clamp(20px, 2.6vw, 28px); margin: 0 0 6px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
+    button { cursor:pointer; border:1px solid #e5e7eb; background:white;
+    padding:8px 12px; border-radius:10px; font-weight:600; }
+    button.primary { background: var(--accent); color: white; border-color:
+    var(--accent); }
+    button:disabled { opacity:.6; cursor:not-allowed }
+    .stats { display:flex; gap:18px; align-items:center; margin-top:10px; }
+    .pill { background:#eef2ff; color:#3730a3; font-weight:700; padding:6px
+    10px; border-radius:999px; }
+    main { max-width: var(--maxw); margin: 12px auto 60px; padding: 0 16px; }
+    .qcard { background:white; border:1px solid #e5e7eb; border-radius:14px;
+    padding:14px; margin:14px 0; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+    .qhead { display:flex; justify-content:space-between; align-items:baseline;
+    gap:6px }
+    .qtitle { font-weight:700; margin:0 0 8px }
+    .badge { font-size:12px; color:#374151; background:#f3f4f6; border:1px
+    solid #e5e7eb; padding:2px 8px; border-radius:999px }
+    .opts { display:grid; gap:8px; margin-top:8px }
+    .opt { display:flex; gap:10px; align-items:flex-start; padding:10px;
+    border:1px solid #e5e7eb; border-radius:12px; background:white; cursor:pointer; }
+    .opt:hover { border-color:#c7d2fe; }
+    .opt.correct { border-color:#16a34a; background:#f0fdf4; }
+    .opt.wrong { border-color:#dc2626; background:#fef2f2; }
+    .opt.disabled { pointer-events:none; opacity:.8 }
+    .letter { width:28px; height:28px; border-radius:999px; border:1px
+    solid #e5e7eb; display:grid; place-items:center; font-weight:700; }
+    .exp { margin-top:10px; border-top:1px dashed #e5e7eb; padding-top:10px;
+    color:#111827; }
+    .exp strong { color:#065f46 }
+    footer { text-align:center; color:#6b7280; padding:30px 12px; }
+    details > summary { cursor:pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2007 – Lecture 1 MCQ Quiz: Introduction & Kotlin</h1>
+      <div class="sub">INF2007 – Mobile Application Development • Lecture 1</div>
+      <div class="stats" id="stats">
+        <span class="pill" id="score">Score: 0</span>
+        <span class="pill" id="progress">Answered: 0 / 0</span>
+        <span class="pill" id="percent">0%</span>
+      </div>
+      <div class="controls">
+        <button class="primary" id="resetBtn" title="Reset the quiz to try again">Reset quiz</button>
+        <button id="revealBtn" title="Reveal correct answers for all questions">Reveal all answers</button>
+        <button id="shuffleBtn" title="Shuffle questions and answer options">Shuffle</button>
+      </div>
+    </div>
+  </header>
+  <main id="quiz"></main>
+  <footer>
+    Based on lecture material. This educational quiz is for practice.
+  </footer>
+  <script>
+    const QUESTIONS = [
+  {
+    "q": "According to the introduction, how does the number of mobile phones compare to the world population?",
+    "options": [
+      "There are more phones than people in the world",
+      "There are fewer phones than people",
+      "The number of phones roughly equals the population",
+      "No data was provided on phone numbers"
+    ],
+    "correct": 0,
+    "why": "The introduction notes that there are more mobile phones than people globally【253913879556534†L15-L18】."
+  },
+  {
+    "q": "Which of the following is NOT a typical mobile resource constraint mentioned in the slides?",
+    "options": [
+      "Limited processing power and RAM",
+      "Unlimited battery life",
+      "Limited disk space and screen size",
+      "Variable connectivity"
+    ],
+    "correct": 1,
+    "why": "Mobile devices are resource‑poor relative to desktops, with limited CPU, memory, storage, and battery【253913879556534†L48-L54】. There is no mention of unlimited battery life."
+  },
+  {
+    "q": "Which sensors are commonly integrated into modern mobile devices?",
+    "options": [
+      "Accelerometers, gyroscopes and magnetometers",
+      "Hydraulic pressure sensors and altimeters",
+      "Only GPS receivers",
+      "None of the above"
+    ],
+    "correct": 0,
+    "why": "The slides list motion sensors (accelerometers, gyroscopes, magnetometers) and GPS among mobile hardware features【253913879556534†L58-L71】."
+  },
+  {
+    "q": "Mobile processors used in smartphones are usually based on which architecture?",
+    "options": [
+      "ARM RISC architecture",
+      "Only x86 CISC architecture",
+      "Mainframe architectures",
+      "Quantum computing architecture"
+    ],
+    "correct": 0,
+    "why": "The introduction notes that mobile processors are usually based on the ARM RISC architecture【253913879556534†L98-L104】."
+  },
+  {
+    "q": "Which layer is NOT part of the generic mobile architecture described?",
+    "options": [
+      "Application layer",
+      "Operating system layer",
+      "Hardware layer",
+      "Database management layer"
+    ],
+    "correct": 3,
+    "why": "The generic mobile architecture comprises the app, OS, hardware and app store【253913879556534†L108-L129】; a database management layer is not listed."
+  },
+  {
+    "q": "What characterizes a native mobile application?",
+    "options": [
+      "It runs directly in the operating system and can access device features",
+      "It is written entirely in JavaScript and runs in a browser",
+      "It cannot access the camera or GPS",
+      "It must be written in HTML and CSS"
+    ],
+    "correct": 0,
+    "why": "Native apps execute directly in the OS, can access device features like camera and GPS, and are typically installed via app stores【253913879556534†L184-L193】."
+  },
+  {
+    "q": "In Kotlin, which keyword declares a variable whose value can be reassigned?",
+    "options": [
+      "var",
+      "val",
+      "const",
+      "let"
+    ],
+    "correct": 0,
+    "why": "The Kotlin slides explain that `var` declares a mutable variable, whereas `val` declares an immutable value【987723225263861†L24-L31】."
+  },
+  {
+    "q": "What does Kotlin's type inference allow you to do?",
+    "options": [
+      "Omit explicit types when the compiler can infer them",
+      "Declare variables without initializing them",
+      "Infer types for null values without annotations",
+      "Convert integers to strings automatically"
+    ],
+    "correct": 0,
+    "why": "Kotlin's compiler can infer the type of a variable based on the assigned value【987723225263861†L33-L40】."
+  },
+  {
+    "q": "How do you declare a nullable variable of type String in Kotlin?",
+    "options": [
+      "val name: String? = null",
+      "var name: String = null",
+      "val name = null",
+      "var name: String = \"\""
+    ],
+    "correct": 0,
+    "why": "To allow null values, Kotlin uses the ? suffix (e.g., `String?`)【987723225263861†L44-L54】. Declaring without ? will not compile."
+  },
+  {
+    "q": "Which Kotlin construct allows you to choose among multiple conditions in a concise way?",
+    "options": [
+      "when expression",
+      "switch case statement",
+      "for loop",
+      "try-catch"
+    ],
+    "correct": 0,
+    "why": "The slides introduce the `when` expression, where each branch is represented by a condition【987723225263861†L79-L86】."
+  },
+  {
+    "q": "Which statement about Kotlin functions is correct?",
+    "options": [
+      "Functions are declared using the `fun` keyword and can return values",
+      "Functions cannot return values",
+      "Functions must be anonymous",
+      "Functions are declared using the `function` keyword"
+    ],
+    "correct": 0,
+    "why": "Kotlin functions use the `fun` keyword and can return a value using `return` or as the last expression【987723225263861†L89-L100】."
+  },
+  {
+    "q": "What is a Kotlin lambda expression?",
+    "options": [
+      "A small anonymous function that can be passed as an argument",
+      "A property of a class",
+      "A reserved word for loops",
+      "A function that must be named"
+    ],
+    "correct": 0,
+    "why": "The slides describe lambda expressions as small anonymous functions that can be assigned to variables or passed to other functions【987723225263861†L139-L150】."
+  },
+  {
+    "q": "Which of the following demonstrates encapsulation in Kotlin classes?",
+    "options": [
+      "Declaring a private property and providing controlled access via a function",
+      "Using only public properties",
+      "Declaring variables outside of classes",
+      "Accessing all class variables directly"
+    ],
+    "correct": 0,
+    "why": "The class example keeps a doorLock property private and exposes an unlockDoor() function for controlled access, illustrating encapsulation【987723225263861†L123-L130】."
+  },
+  {
+    "q": "What happens if you try to assign null to a non‑nullable Kotlin variable?",
+    "options": [
+      "Compilation fails due to null safety",
+      "The value defaults to an empty string",
+      "The variable becomes nullable automatically",
+      "A runtime NullPointerException is thrown"
+    ],
+    "correct": 0,
+    "why": "Kotlin variables cannot hold null values by default; attempting to assign null causes a compilation error【987723225263861†L44-L54】."
+  },
+  {
+    "q": "Which scope function allows performing operations on a nullable object only when it is non‑null?",
+    "options": [
+      "let",
+      "apply",
+      "with",
+      "also"
+    ],
+    "correct": 0,
+    "why": "The slide shows using the `let` function on a nullable string to safely call methods when it is non‑null【987723225263861†L152-L166】."
+  },
+  {
+    "q": "Which statement about Kotlin's `val` keyword is true?",
+    "options": [
+      "Variables declared with `val` cannot be reassigned",
+      "`val` variables can be reassigned like `var`",
+      "`val` declares a nullable variable",
+      "`val` must always have an explicit type"
+    ],
+    "correct": 0,
+    "why": "The slides state that `val` is used for a variable whose value never changes【987723225263861†L24-L31】."
+  },
+  {
+    "q": "Which code snippet correctly defines a simple Kotlin function that returns a String?",
+    "options": [
+      "fun greet(): String { return \"Hello\" }",
+      "function greet(): String { return \"Hello\" }",
+      "fun greet() = 42",
+      "String greet() { return \"Hello\" }"
+    ],
+    "correct": 0,
+    "why": "Kotlin functions use the `fun` keyword, the return type follows the parentheses, and the body can return a String【987723225263861†L89-L100】."
+  },
+  {
+    "q": "What does the Kotlin `when` expression return if no branch matches?",
+    "options": [
+      "The `else` branch result",
+      "Null always",
+      "It throws an exception",
+      "It returns Unit"
+    ],
+    "correct": 0,
+    "why": "The `when` expression requires an `else` branch to handle unmatched conditions; that branch determines the return value【987723225263861†L79-L86】."
+  },
+  {
+    "q": "Which of the following best describes Kotlin's type inference?",
+    "options": [
+      "The compiler infers types based on the assigned values, allowing you to omit explicit types",
+      "Variables have no type",
+      "It automatically converts between types",
+      "It requires you to specify types at all times"
+    ],
+    "correct": 0,
+    "why": "The slides demonstrate that Kotlin can infer the type of a variable from the assigned value【987723225263861†L33-L40】."
+  },
+  {
+    "q": "What is the correct way to declare a function that takes no parameters and returns Unit in Kotlin?",
+    "options": [
+      "fun doNothing() { }",
+      "void doNothing() {}",
+      "function doNothing() {}",
+      "fun doNothing: Unit"
+    ],
+    "correct": 0,
+    "why": "An empty Kotlin function is declared with `fun`, empty parentheses and an empty body【987723225263861†L89-L100】. Unit is implied."
+  },
+  {
+    "q": "Which of these statements about Kotlin lambdas is correct?",
+    "options": [
+      "They are anonymous functions that can be stored in variables and passed as arguments",
+      "They must be named like regular functions",
+      "They cannot return values",
+      "They are defined using the `def` keyword"
+    ],
+    "correct": 0,
+    "why": "Lambdas are small anonymous functions that can be assigned to variables or passed around【987723225263861†L139-L150】."
+  },
+  {
+    "q": "What is the purpose of the `val` keyword when defining class properties in Kotlin?",
+    "options": [
+      "It creates read‑only properties that cannot be reassigned",
+      "It makes the property nullable",
+      "It allows overriding the property in subclasses",
+      "It automatically generates getters and setters only"
+    ],
+    "correct": 0,
+    "why": "Within a class, properties declared with `val` represent state that cannot be reassigned, enforcing immutability【987723225263861†L112-L130】."
+  },
+  {
+    "q": "Which feature reduces the number of NullPointerExceptions in Kotlin?",
+    "options": [
+      "Null safety with nullable types",
+      "Implicit type conversions",
+      "Uninitialized variables",
+      "Automatic null coercion"
+    ],
+    "correct": 0,
+    "why": "Kotlin's null safety requires explicit nullable types (String?), preventing accidental null assignments【987723225263861†L44-L54】."
+  },
+  {
+    "q": "How do you call a lambda stored in a variable called `stringLength` that accepts a String and returns an Int?",
+    "options": [
+      "val result = stringLength(\"Android\")",
+      "val result = stringLength.invoke()",
+      "stringLength = \"Android\"",
+      "stringLength.call(\"Android\")"
+    ],
+    "correct": 0,
+    "why": "A lambda can be invoked by calling it like a regular function, e.g., `stringLength(\"Android\")`【987723225263861†L107-L110】."
+  },
+  {
+    "q": "Which of these is true about Kotlin anonymous functions compared to named functions?",
+    "options": [
+      "They can be stored in variables and passed as parameters",
+      "They cannot take parameters",
+      "They must always return Unit",
+      "They cannot contain multiple expressions"
+    ],
+    "correct": 0,
+    "why": "Anonymous functions (including lambdas) can take parameters, return values and be passed to other functions【987723225263861†L101-L111】."
+  },
+  {
+    "q": "What happens when you attempt to call `languageName.inc()` on a Kotlin String?",
+    "options": [
+      "The code fails to compile because String has no inc() method",
+      "It returns the next character in the alphabet",
+      "It converts the string to uppercase",
+      "It adds a number to the end of the string"
+    ],
+    "correct": 0,
+    "why": "The example shows that calling `languageName.inc()` on a String fails to compile because String does not define an `inc()` method【987723225263861†L38-L41】."
+  },
+  {
+    "q": "Which of the following is NOT part of the Kotlin feature recap?",
+    "options": [
+      "Functional programming constructs like lambdas",
+      "Semi‑colons are optional",
+      "Kotlin requires XML layout files for UI",
+      "Named function parameters"
+    ],
+    "correct": 2,
+    "why": "The feature recap lists null safety, var/val, conditional expressions, lambdas, extension functions, named parameters and that semicolons are optional【987723225263861†L168-L176】. It does not mention requiring XML layouts."
+  },
+  {
+    "q": "In a Kotlin `if` expression that returns a value, which branch's value is returned if all conditions fail?",
+    "options": [
+      "The `else` branch",
+      "It returns Unit",
+      "It returns null automatically",
+      "The program throws an exception"
+    ],
+    "correct": 0,
+    "why": "When used as an expression, `if` must have an `else` branch whose value becomes the result when all previous conditions are false【987723225263861†L68-L76】."
+  },
+  {
+    "q": "Which of the following describes a Kotlin property?",
+    "options": [
+      "A class‑level variable with optional custom getter and setter",
+      "A function that cannot return a value",
+      "An immutable constant value outside any class",
+      "A reserved keyword for resource IDs"
+    ],
+    "correct": 0,
+    "why": "Classes represent state using properties, which can include getters, setters and backing fields【987723225263861†L112-L130】."
+  },
+  {
+    "q": "Why do Kotlin developers prefer using `val` for most variables?",
+    "options": [
+      "To encourage immutability and safer code",
+      "Because `val` variables are faster to execute",
+      "Because `val` variables can hold null by default",
+      "Because `var` is deprecated"
+    ],
+    "correct": 0,
+    "why": "Immutability reduces accidental state changes; the slides note that `val` is used when the value never changes【987723225263861†L24-L31】."
+  },
+  {
+    "q": "What is the output type of a Kotlin function declared with `fun add(a: Int, b: Int) = a + b`?",
+    "options": [
+      "Int",
+      "String",
+      "Unit",
+      "Boolean"
+    ],
+    "correct": 0,
+    "why": "The function returns the sum of two integers; Kotlin infers the return type as Int【987723225263861†L33-L40】."
+  },
+  {
+    "q": "Which Kotlin syntax correctly declares a read‑only list of Wheels inside a Car class?",
+    "options": [
+      "class Car { val wheels = listOf<Wheel>() }",
+      "class Car { var wheels = mutableListOf<Wheel>() }",
+      "val Car.wheels = listOf<Wheel>()",
+      "class Car(wheels: List<Wheel>)"
+    ],
+    "correct": 0,
+    "why": "The slides show a Car class with a `val wheels` property initialized with `listOf<Wheel>()`, making it read‑only【987723225263861†L112-L120】."
+  },
+  {
+    "q": "What happens if you omit the type when declaring `val languageName = \"Kotlin\"`?",
+    "options": [
+      "The compiler infers that languageName is a String",
+      "It infers languageName as Any",
+      "The variable becomes null",
+      "The code fails to compile"
+    ],
+    "correct": 0,
+    "why": "The compiler can infer the type based on the assigned value; in this case it infers a String【987723225263861†L33-L40】."
+  },
+  {
+    "q": "Which of the following is a correct example of a higher‑order function in Kotlin?",
+    "options": [
+      "fun operate(x: Int, y: Int, op: (Int, Int) -> Int): Int = op(x, y)",
+      "fun operate(x: Int, y: Int): Int = x + y",
+      "val operate = { x: Int, y: Int -> x * y }",
+      "fun operate(x: Int, y: Int) { return op }"
+    ],
+    "correct": 0,
+    "why": "A higher‑order function takes a function type as a parameter; the slides mention higher‑order functions and lambdas【987723225263861†L168-L176】."
+  },
+  {
+    "q": "Why should you avoid manually mutating state inside a composable function in Compose?",
+    "options": [
+      "Composable functions should be pure and avoid side effects",
+      "It is faster to mutate state directly",
+      "State cannot be changed in Compose",
+      "Compose automatically mutates all state"
+    ],
+    "correct": 0,
+    "why": "Composable functions should be pure: the same input yields the same output, and side effects should be avoided【543652055253700†L114-L117】."
+  },
+  {
+    "q": "What does the Kotlin `let` function do when used with a nullable reference?",
+    "options": [
+      "Executes a block only if the reference is not null and returns the block's result",
+      "Always throws a NullPointerException if the reference is null",
+      "Ignores the reference altogether",
+      "Converts the reference to a String"
+    ],
+    "correct": 0,
+    "why": "The `let` scope function performs an operation on a nullable object only when it is non‑null and returns the result【987723225263861†L152-L166】."
+  }
+];
+    // --- Quiz Logic (DO NOT MODIFY) ---
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const percentEl = document.getElementById('percent');
+    const resetBtn = document.getElementById('resetBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    let state = { score: 0, answered: 0 };
+    let currentQuestions = [];
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    function buildQuestions() {
+      return shuffle(QUESTIONS).map(q => (({
+        q: q.q,
+        options: shuffle(q.options.map((txt, i) => ({ txt, isCorrect: i === q.correct }))),
+        correct: 0,
+        why: q.why,
+        __answered: false
+      }))).map(item => {
+        item.correct = item.options.findIndex(o => o.isCorrect);
+        item.options = item.options.map(o => o.txt);
+        return item;
+      });
+    }
+    function render() {
+      quizEl.innerHTML = '';
+      currentQuestions.forEach((item, qi) => {
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        const head = document.createElement('div');
+        head.className = 'qhead';
+        const titleEl = document.createElement('p');
+        titleEl.className = 'qtitle';
+        titleEl.textContent = `${qi + 1}. ${item.q}`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = `Q${qi + 1}`;
+        head.appendChild(titleEl);
+        head.appendChild(badge);
+        card.appendChild(head);
+        const opts = document.createElement('div');
+        opts.className = 'opts';
+        item.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'opt';
+          row.setAttribute('data-q', qi);
+          row.setAttribute('data-o', oi);
+          const letter = document.createElement('div');
+          letter.className = 'letter';
+          letter.textContent = String.fromCharCode(65 + oi);
+          const span = document.createElement('span');
+          span.innerHTML = opt;
+          row.appendChild(letter);
+          row.appendChild(span);
+          row.addEventListener('click', onChoose);
+          opts.appendChild(row);
+        });
+        const exp = document.createElement('div');
+        exp.className = 'exp';
+        exp.hidden = true;
+        exp.innerHTML = `<strong>Explanation:</strong> ${item.why}`;
+        card.appendChild(opts);
+        card.appendChild(exp);
+        quizEl.appendChild(card);
+      });
+      updateStats();
+    }
+    function onChoose(e) {
+      const btn = e.currentTarget;
+      const qIndex = +btn.getAttribute('data-q');
+      const oIndex = +btn.getAttribute('data-o');
+      const card = btn.closest('.qcard');
+      const exp = card.querySelector('.exp');
+      const data = currentQuestions[qIndex];
+      if (data.__answered) return;
+      const options = card.querySelectorAll('.opt');
+      options.forEach(b => b.classList.add('disabled'));
+      data.__answered = true;
+      state.answered++;
+      if (oIndex === data.correct) {
+        btn.classList.add('correct');
+        state.score++;
+      } else {
+        btn.classList.add('wrong');
+        options[data.correct].classList.add('correct');
+      }
+      exp.hidden = false;
+      updateStats();
+    }
+    function updateStats() {
+      scoreEl.textContent = `Score: ${state.score}`;
+      progressEl.textContent = `Answered: ${state.answered} / ${currentQuestions.length}`;
+      const pct = currentQuestions.length ? Math.round((state.score/currentQuestions.length)*100) : 0;
+      percentEl.textContent = `${pct}%`;
+    }
+    function revealAll() {
+      document.querySelectorAll('.qcard').forEach((card, qi) => {
+        const data = currentQuestions[qi];
+        const exp = card.querySelector('.exp');
+        const options = card.querySelectorAll('.opt');
+        options.forEach((b, oi) => {
+          b.classList.remove('wrong');
+          if (oi === data.correct) b.classList.add('correct');
+          b.classList.add('disabled');
+        });
+        data.__answered = true;
+        exp.hidden = false;
+      });
+    }
+    function resetQuiz() {
+      state.score = 0; state.answered = 0;
+      render();
+    }
+    function shuffleQuiz() {
+      state.score = 0; state.answered = 0;
+      currentQuestions = buildQuestions();
+      render();
+    }
+    resetBtn.addEventListener('click', resetQuiz);
+    revealBtn.addEventListener('click', revealAll);
+    shuffleBtn.addEventListener('click', shuffleQuiz);
+    currentQuestions = buildQuestions();
+    render();
+  </script>
+</body>
+</html>

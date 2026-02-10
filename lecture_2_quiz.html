@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INF2007 – Lecture 2 MCQ Quiz: Android Platform & App Fundamentals</title>
+  <style>
+    :root { --maxw: 980px; --accent: #0f766e; --muted:#6b7280; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", sans-serif; line-height: 1.45; margin: 0; background: #f7f7f8;
+    color:#111827; }
+    header { background: white; border-bottom: 1px solid #e5e7eb; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 18px 16px; }
+    h1 { font-size: clamp(20px, 2.6vw, 28px); margin: 0 0 6px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
+    button { cursor:pointer; border:1px solid #e5e7eb; background:white;
+    padding:8px 12px; border-radius:10px; font-weight:600; }
+    button.primary { background: var(--accent); color: white; border-color:
+    var(--accent); }
+    button:disabled { opacity:.6; cursor:not-allowed }
+    .stats { display:flex; gap:18px; align-items:center; margin-top:10px; }
+    .pill { background:#eef2ff; color:#3730a3; font-weight:700; padding:6px
+    10px; border-radius:999px; }
+    main { max-width: var(--maxw); margin: 12px auto 60px; padding: 0 16px; }
+    .qcard { background:white; border:1px solid #e5e7eb; border-radius:14px;
+    padding:14px; margin:14px 0; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+    .qhead { display:flex; justify-content:space-between; align-items:baseline;
+    gap:6px }
+    .qtitle { font-weight:700; margin:0 0 8px }
+    .badge { font-size:12px; color:#374151; background:#f3f4f6; border:1px
+    solid #e5e7eb; padding:2px 8px; border-radius:999px }
+    .opts { display:grid; gap:8px; margin-top:8px }
+    .opt { display:flex; gap:10px; align-items:flex-start; padding:10px;
+    border:1px solid #e5e7eb; border-radius:12px; background:white; cursor:pointer; }
+    .opt:hover { border-color:#c7d2fe; }
+    .opt.correct { border-color:#16a34a; background:#f0fdf4; }
+    .opt.wrong { border-color:#dc2626; background:#fef2f2; }
+    .opt.disabled { pointer-events:none; opacity:.8 }
+    .letter { width:28px; height:28px; border-radius:999px; border:1px
+    solid #e5e7eb; display:grid; place-items:center; font-weight:700; }
+    .exp { margin-top:10px; border-top:1px dashed #e5e7eb; padding-top:10px;
+    color:#111827; }
+    .exp strong { color:#065f46 }
+    footer { text-align:center; color:#6b7280; padding:30px 12px; }
+    details > summary { cursor:pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>INF2007 – Lecture 2 MCQ Quiz: Android Platform & App Fundamentals</h1>
+      <div class="sub">INF2007 – Mobile Application Development • Lecture 2</div>
+      <div class="stats" id="stats">
+        <span class="pill" id="score">Score: 0</span>
+        <span class="pill" id="progress">Answered: 0 / 0</span>
+        <span class="pill" id="percent">0%</span>
+      </div>
+      <div class="controls">
+        <button class="primary" id="resetBtn" title="Reset the quiz to try again">Reset quiz</button>
+        <button id="revealBtn" title="Reveal correct answers for all questions">Reveal all answers</button>
+        <button id="shuffleBtn" title="Shuffle questions and answer options">Shuffle</button>
+      </div>
+    </div>
+  </header>
+  <main id="quiz"></main>
+  <footer>
+    Based on lecture material. This educational quiz is for practice.
+  </footer>
+  <script>
+    const QUESTIONS = [
+  {
+    "q": "Which of the following describes Android as highlighted in the platform introduction?",
+    "options": [
+      "A mostly open‑source software stack licensed under Apache 2.0",
+      "A closed‑source system owned entirely by Google",
+      "A purely microkernel OS without Linux components",
+      "An operating system available only for desktop computers"
+    ],
+    "correct": 0,
+    "why": "Android is described as a (mostly) open‑source software stack with an Apache 2.0 license【506075350431960†L15-L27】."
+  },
+  {
+    "q": "Which processor architectures are supported by the Android platform?",
+    "options": [
+      "ARM (32‑bit/64‑bit), MIPS and x86",
+      "Only ARM",
+      "Only x64",
+      "Mainframe architectures"
+    ],
+    "correct": 0,
+    "why": "The Android platform supports ARM, MIPS and x86 processor architectures【506075350431960†L31-L35】."
+  },
+  {
+    "q": "What is the role of the hardware abstraction layer (HAL) in Android?",
+    "options": [
+      "It provides an interface between the kernel drivers and user‑space native libraries",
+      "It replaces the kernel entirely",
+      "It runs applications directly",
+      "It implements the Java API framework"
+    ],
+    "correct": 0,
+    "why": "The HAL provides the interface between kernel drivers and user‑space native libraries and allows drivers without standard APIs【506075350431960†L85-L90】."
+  },
+  {
+    "q": "Which of the following is NOT a native library listed in the Android OS stack?",
+    "options": [
+      "OpenGL ES for 3D rendering",
+      "libc (Bionic) for C functions",
+      "WebKit for browser rendering",
+      "TensorFlow for machine learning"
+    ],
+    "correct": 3,
+    "why": "Native libraries include libc/Bionic, SSL, SGL, OpenGL ES, the media framework, SQLite, WebKit, and others【506075350431960†L96-L110】. TensorFlow is not listed."
+  },
+  {
+    "q": "What is a key difference between Dalvik and ART runtimes?",
+    "options": [
+      "ART compiles bytecode ahead of time to native machine code, whereas Dalvik uses just‑in‑time compilation",
+      "Dalvik compiles apps ahead of time and ART interprets bytecode",
+      "Both runtimes use identical compilation strategies",
+      "ART runs only Java applications and Dalvik runs only Kotlin applications"
+    ],
+    "correct": 0,
+    "why": "ART performs ahead‑of‑time compilation to native code, leading to faster startup and improved garbage collection, while Dalvik used JIT compilation【506075350431960†L157-L169】【506075350431960†L171-L179】."
+  },
+  {
+    "q": "Which of the following components are part of the Android application framework?",
+    "options": [
+      "Classes for implementing application components (Activities, Services, etc.)",
+      "Kernel drivers and schedulers",
+      "BIOS firmware for the device",
+      "Native C libraries only"
+    ],
+    "correct": 0,
+    "why": "The Java API framework includes classes for implementing application components like Activities and Services as part of the android.* packages【506075350431960†L186-L199】."
+  },
+  {
+    "q": "In the app fundamentals lecture, what does an Android application process typically contain?",
+    "options": [
+      "One or more threads executing the app's code",
+      "A single thread that cannot spawn additional threads",
+      "No executable code; threads are external",
+      "Only UI widgets without code"
+    ],
+    "correct": 0,
+    "why": "An application process is a running instance of the app code and can consist of multiple threads【594818497736741†L33-L56】."
+  },
+  {
+    "q": "How do processes differ from threads according to the app fundamentals slides?",
+    "options": [
+      "Processes run in separate memory spaces, whereas threads share the same memory space",
+      "Threads are created in separate address spaces",
+      "Processes share a common heap, threads do not",
+      "There is no difference between processes and threads in Android"
+    ],
+    "correct": 0,
+    "why": "Processes run in separate memory spaces, whereas threads of the same process share its memory space【594818497736741†L73-L77】."
+  },
+  {
+    "q": "Which Android component provides the entry point for user interactions?",
+    "options": [
+      "Activity",
+      "Service",
+      "BroadcastReceiver",
+      "ContentProvider"
+    ],
+    "correct": 0,
+    "why": "An Activity is the primary class for user interaction and typically corresponds to one screen【594818497736741†L119-L129】."
+  },
+  {
+    "q": "Which component runs in the background without a user interface and performs long‑running operations?",
+    "options": [
+      "Service",
+      "Activity",
+      "BroadcastReceiver",
+      "ContentProvider"
+    ],
+    "correct": 0,
+    "why": "Services are UI‑less components that run in the background to perform long‑running operations【594818497736741†L168-L174】."
+  },
+  {
+    "q": "What is the purpose of an Intent in Android?",
+    "options": [
+      "To start components or send broadcast messages",
+      "To define database schemas",
+      "To allocate memory",
+      "To create UI layouts"
+    ],
+    "correct": 0,
+    "why": "Intents are events or messages used to start components or send broadcasts【594818497736741†L181-L186】."
+  },
+  {
+    "q": "Which component listens for system‑wide broadcast announcements such as battery level changes?",
+    "options": [
+      "BroadcastReceiver",
+      "Activity",
+      "ContentProvider",
+      "Service"
+    ],
+    "correct": 0,
+    "why": "BroadcastReceiver responds to system‑wide broadcasts like phone calls or battery level changes【594818497736741†L191-L198】."
+  },
+  {
+    "q": "Which Android component manages a shared set of application data across processes?",
+    "options": [
+      "ContentProvider",
+      "Activity",
+      "BroadcastReceiver",
+      "Service"
+    ],
+    "correct": 0,
+    "why": "ContentProvider handles sharing and managing data across application boundaries【594818497736741†L211-L218】."
+  },
+  {
+    "q": "In the development environment lecture, what is the primary difference between an emulator and a simulator?",
+    "options": [
+      "An emulator replicates the original system closely, whereas a simulator approximates behaviour",
+      "There is no difference; the terms are interchangeable",
+      "A simulator runs faster than an emulator",
+      "An emulator cannot run Android apps"
+    ],
+    "correct": 0,
+    "why": "The lecture explains that emulation behaves exactly like the original system, while simulation behaves similarly but may be implemented differently【238137410599348†L38-L47】."
+  },
+  {
+    "q": "Which tool monitors CPU and memory usage and helps analyze app behaviour?",
+    "options": [
+      "Android Profiler",
+      "Android Emulator",
+      "Manifest Editor",
+      "Resource Manager"
+    ],
+    "correct": 0,
+    "why": "The Android Profiler is used to monitor and analyze application behaviour, CPU and memory usage【238137410599348†L59-L64】."
+  },
+  {
+    "q": "What is the first step in the typical Android app development workflow outlined in the slides?",
+    "options": [
+      "Define resources and XML",
+      "Implement the code in Kotlin",
+      "Package the application",
+      "Install and run the application"
+    ],
+    "correct": 0,
+    "why": "The workflow lists 'Define Resources & XML' as the first step before implementing code【238137410599348†L70-L80】."
+  },
+  {
+    "q": "Where are strings defined in an Android project?",
+    "options": [
+      "In res/values/*.xml files",
+      "In the AndroidManifest.xml file",
+      "In Kotlin class files",
+      "In the Gradle build script"
+    ],
+    "correct": 0,
+    "why": "String resources, including arrays and plurals, are stored in res/values/*.xml and referenced via @string identifiers【238137410599348†L112-L119】."
+  },
+  {
+    "q": "Which file automatically maps resource IDs to variables accessible in code?",
+    "options": [
+      "R.java (or R.kt)",
+      "build.gradle",
+      "AndroidManifest.xml",
+      "MainActivity.kt"
+    ],
+    "correct": 0,
+    "why": "Resources are compiled into the auto‑generated R.java class, which maps resource IDs for access in code【238137410599348†L100-L108】."
+  },
+  {
+    "q": "Which Android file declares essential information like application name, components and permissions?",
+    "options": [
+      "AndroidManifest.xml",
+      "build.gradle",
+      "strings.xml",
+      "MainActivity.kt"
+    ],
+    "correct": 0,
+    "why": "The AndroidManifest.xml file contains essential information such as the app name, components, permissions and minimum API level【238137410599348†L158-L166】."
+  },
+  {
+    "q": "Which statement accurately describes centralized version control systems?",
+    "options": [
+      "A single server contains all versioned files, creating a potential single point of failure",
+      "Every user has a full copy of the repository, eliminating any single point of failure",
+      "Centralized systems are identical to distributed systems like Git",
+      "Centralized systems cannot be used for code"
+    ],
+    "correct": 0,
+    "why": "Centralized version control stores all versioned files on a single server, which can become a single point of failure【238137410599348†L189-L194】."
+  },
+  {
+    "q": "What is one benefit of distributed version control systems such as Git?",
+    "options": [
+      "Each clone of the repository acts as a full backup, eliminating a single point of failure",
+      "Repositories are stored only on one server",
+      "They require an internet connection to commit changes",
+      "They do not keep history of changes"
+    ],
+    "correct": 0,
+    "why": "Distributed version control systems fully mirror the repository; any clone can restore the full history if a server fails【238137410599348†L199-L205】."
+  },
+  {
+    "q": "Which Android component is responsible for managing non‑compiled resources like strings and graphics?",
+    "options": [
+      "Resource Manager",
+      "Activity Manager",
+      "Intent Service",
+      "Kernel"
+    ],
+    "correct": 0,
+    "why": "The resource manager handles non‑compiled resources such as strings and graphics【506075350431960†L199-L208】."
+  },
+  {
+    "q": "What does the term 'sandboxing' refer to in the Android runtime?",
+    "options": [
+      "Each app runs in its own process and instance of the VM for isolation",
+      "Running all apps in the same process",
+      "Sharing memory between all apps to improve performance",
+      "Using only the Dalvik runtime for all apps"
+    ],
+    "correct": 0,
+    "why": "The Android runtime assigns each app its own process and VM instance, providing sandboxing and isolation【506075350431960†L121-L126】."
+  },
+  {
+    "q": "What does the binder driver in the Android kernel do?",
+    "options": [
+      "Provides an interprocess communication interface",
+      "Manages the battery",
+      "Handles camera operations",
+      "Controls network sockets"
+    ],
+    "correct": 0,
+    "why": "The kernel includes a binder driver that acts as an IPC interface, enabling communication between processes【506075350431960†L69-L77】."
+  },
+  {
+    "q": "Which statement best describes a thread according to the slides?",
+    "options": [
+      "A thread is an entity within a process that can be scheduled and shares the process's resources",
+      "A thread has its own separate address space",
+      "Threads do not have any identifiers",
+      "Threads cannot create other threads"
+    ],
+    "correct": 0,
+    "why": "A thread shares its process's virtual address space and has its own identifier and scheduling priority【594818497736741†L60-L68】."
+  },
+  {
+    "q": "What happens when an Activity is destroyed?",
+    "options": [
+      "The onDestroy() lifecycle method is called to indicate termination",
+      "The system immediately restarts the Activity",
+      "The onPause() method runs again",
+      "No lifecycle callback is invoked"
+    ],
+    "correct": 0,
+    "why": "When an Activity is closed or destroyed, the onDestroy() method is called to indicate that it is being terminated【594818497736741†L133-L145】."
+  },
+  {
+    "q": "Which UI elements are building blocks of the Activity/UI according to the slides?",
+    "options": [
+      "TextView, Button, ListView, ImageView",
+      "RecyclerView, Activity, Service",
+      "BroadcastReceiver, Intent, ContentProvider",
+      "Manifest, Gradle, ProGuard"
+    ],
+    "correct": 0,
+    "why": "TextView, EditText, Button, ListView, ImageView and others are listed as View subclasses that form the UI building blocks【594818497736741†L147-L157】."
+  },
+  {
+    "q": "Which statement about threads and processes is true?",
+    "options": [
+      "Threads run inside a process and share its resources",
+      "Processes share a single thread",
+      "Threads and processes are synonymous",
+      "Processes are lighter weight than threads"
+    ],
+    "correct": 0,
+    "why": "Threads share a process's virtual address space and resources, whereas processes have separate memory spaces【594818497736741†L73-L77】."
+  }
+];
+    // --- Quiz Logic (DO NOT MODIFY) ---
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+    const progressEl = document.getElementById('progress');
+    const percentEl = document.getElementById('percent');
+    const resetBtn = document.getElementById('resetBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    let state = { score: 0, answered: 0 };
+    let currentQuestions = [];
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+    function buildQuestions() {
+      return shuffle(QUESTIONS).map(q => (({
+        q: q.q,
+        options: shuffle(q.options.map((txt, i) => ({ txt, isCorrect: i === q.correct }))),
+        correct: 0,
+        why: q.why,
+        __answered: false
+      }))).map(item => {
+        item.correct = item.options.findIndex(o => o.isCorrect);
+        item.options = item.options.map(o => o.txt);
+        return item;
+      });
+    }
+    function render() {
+      quizEl.innerHTML = '';
+      currentQuestions.forEach((item, qi) => {
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        const head = document.createElement('div');
+        head.className = 'qhead';
+        const titleEl = document.createElement('p');
+        titleEl.className = 'qtitle';
+        titleEl.textContent = `${qi + 1}. ${item.q}`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = `Q${qi + 1}`;
+        head.appendChild(titleEl);
+        head.appendChild(badge);
+        card.appendChild(head);
+        const opts = document.createElement('div');
+        opts.className = 'opts';
+        item.options.forEach((opt, oi) => {
+          const row = document.createElement('div');
+          row.className = 'opt';
+          row.setAttribute('data-q', qi);
+          row.setAttribute('data-o', oi);
+          const letter = document.createElement('div');
+          letter.className = 'letter';
+          letter.textContent = String.fromCharCode(65 + oi);
+          const span = document.createElement('span');
+          span.innerHTML = opt;
+          row.appendChild(letter);
+          row.appendChild(span);
+          row.addEventListener('click', onChoose);
+          opts.appendChild(row);
+        });
+        const exp = document.createElement('div');
+        exp.className = 'exp';
+        exp.hidden = true;
+        exp.innerHTML = `<strong>Explanation:</strong> ${item.why}`;
+        card.appendChild(opts);
+        card.appendChild(exp);
+        quizEl.appendChild(card);
+      });
+      updateStats();
+    }
+    function onChoose(e) {
+      const btn = e.currentTarget;
+      const qIndex = +btn.getAttribute('data-q');
+      const oIndex = +btn.getAttribute('data-o');
+      const card = btn.closest('.qcard');
+      const exp = card.querySelector('.exp');
+      const data = currentQuestions[qIndex];
+      if (data.__answered) return;
+      const options = card.querySelectorAll('.opt');
+      options.forEach(b => b.classList.add('disabled'));
+      data.__answered = true;
+      state.answered++;
+      if (oIndex === data.correct) {
+        btn.classList.add('correct');
+        state.score++;
+      } else {
+        btn.classList.add('wrong');
+        options[data.correct].classList.add('correct');
+      }
+      exp.hidden = false;
+      updateStats();
+    }
+    function updateStats() {
+      scoreEl.textContent = `Score: ${state.score}`;
+      progressEl.textContent = `Answered: ${state.answered} / ${currentQuestions.length}`;
+      const pct = currentQuestions.length ? Math.round((state.score/currentQuestions.length)*100) : 0;
+      percentEl.textContent = `${pct}%`;
+    }
+    function revealAll() {
+      document.querySelectorAll('.qcard').forEach((card, qi) => {
+        const data = currentQuestions[qi];
+        const exp = card.querySelector('.exp');
+        const options = card.querySelectorAll('.opt');
+        options.forEach((b, oi) => {
+          b.classList.remove('wrong');
+          if (oi === data.correct) b.classList.add('correct');
+          b.classList.add('disabled');
+        });
+        data.__answered = true;
+        exp.hidden = false;
+      });
+    }
+    function resetQuiz() {
+      state.score = 0; state.answered = 0;
+      render();
+    }
+    function shuffleQuiz() {
+      state.score = 0; state.answered = 0;
+      currentQuestions = buildQuestions();
+      render();
+    }
+    resetBtn.addEventListener('click', resetQuiz);
+    revealBtn.addEventListener('click', revealAll);
+    shuffleBtn.addEventListener('click', shuffleQuiz);
+    currentQuestions = buildQuestions();
+    render();
+  </script>
+</body>
+</html>
